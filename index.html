@@ -289,6 +289,16 @@ body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--tx1);backg
 .sb-req-val{color:var(--tx4);font-size:10px;white-space:nowrap;}
 @media(max-width:900px){.sidebar,.panel{display:none;}}
 .sem-courses.drop-target{outline:2px dashed var(--brand);background:var(--brand-l);border-radius:var(--r);}
+/* 졸업요건 드롭존 */
+[id^="req-grid-"].drop-target{outline:2px dashed var(--brand);background:var(--brand-l);border-radius:var(--r);padding:4px;}
+/* 카드 공통 호버 */
+.cc[draggable="true"]{cursor:grab;transition:box-shadow .15s,transform .15s,opacity .2s;}
+.cc[draggable="true"]:hover{box-shadow:0 3px 14px rgba(0,0,0,.11);transform:translateY(-2px);}
+.cc[draggable="true"]:active{cursor:grabbing;}
+/* 드래그 중인 카드 */
+.cc.dragging{opacity:.3!important;outline:2px dashed var(--brand-b);outline-offset:2px;transform:none!important;}
+/* 드래그 대상 카드 호버 (졸업요건 내 재정렬) */
+.cc.drag-over{outline:2px solid var(--brand);outline-offset:2px;background:var(--brand-l)!important;transform:translateY(-1px);}
 .cc[draggable="true"]{cursor:grab;}
 .cc.drag-insert{outline:2px solid var(--brand);outline-offset:2px;background:var(--brand-l)!important;}
 </style>
@@ -527,6 +537,7 @@ body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--tx1);backg
         <button onclick="openMasterDB()" style="margin-right:6px;padding:6px 12px;border:1.5px solid var(--border2);border-radius:6px;background:none;font-size:11px;color:var(--tx3);cursor:pointer;font-family:inherit;font-weight:500;transition:background .12s,color .12s" onmouseover="this.style.background='var(--surface2)';this.style.color='var(--tx1)'" onmouseout="this.style.background='none';this.style.color='var(--tx3)'">📋 전체 과목</button>
         <button class="tab-btn" onclick="openModal()">+ 과목 추가</button>
         <button onclick="manualSave()" style="margin-left:6px;padding:6px 10px;border:1.5px solid var(--border2);border-radius:6px;background:none;font-size:11px;color:var(--tx3);cursor:pointer;font-family:inherit" title="저장">저장</button>
+        <button onclick="exportData()" style="margin-left:4px;padding:6px 10px;border:1.5px solid var(--border2);border-radius:6px;background:none;font-size:11px;color:var(--tx3);cursor:pointer;font-family:inherit" title="데이터 내보내기">⬇ 내보내기</button>
         <button id="simToggleBtn" onclick="togglePanel()" title="플래닝 시뮬레이터"
           style="margin-left:6px;padding:6px 10px;border:1.5px solid var(--border2);border-radius:6px;background:none;font-size:11px;color:var(--tx3);cursor:pointer;font-family:inherit;font-weight:500;display:none;transition:background .12s,color .12s,border-color .12s"
           onmouseover="this.style.background='var(--surface2)';this.style.color='var(--tx1)'"
@@ -594,6 +605,25 @@ body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--tx1);backg
     </div>
   </div>
 </div>
+<!-- SEMESTER EDIT MODAL -->
+<div class="overlay" id="semModal">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-hd"><span class="modal-title">학기 편집</span><button class="modal-x" onclick="closeSemModal()">✕</button></div>
+    <div class="modal-bd">
+      <label class="f-label">학기 이름</label>
+      <input type="text" class="f-input" id="semModalName" placeholder="예: 3학년 2학기 (2026-1)"/>
+    </div>
+    <div class="modal-ft" style="justify-content:space-between">
+      <button class="btn" id="semModalDelBtn" onclick="deleteSemFromModal()"
+        style="color:var(--red);border-color:var(--red-b)">학기 삭제</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn" onclick="closeSemModal()">취소</button>
+        <button class="btn btn-p" onclick="saveSemModal()">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -699,89 +729,97 @@ const DB = {
 
   '김경민': {
     major:'연극영화학과(영화트랙)', year:'23학번', totalRequired:120,
-    progress:37, totalDone:44, totalCurrent:12, remainSem:2,
-    alert:'지금 캡스톤도 듣고 있잖아요! 대학영어랑 전공필수 조금 남았는데, 하나씩 채워봐요 💪',
+    progress:73, totalDone:88, totalCurrent:12, remainSem:2,
+    alert:'교양 필수교과 대학영어(2학점) + 전공필수 8학점 남았어요. 현학기 캡스톤 이수 후 남은 요건 채우면 졸업 가능해요 💪',
     reqs:[
-      {name:'전공 기초',    cls:'rb-ok',   text:'12/10학점 충족'},
-      {name:'전공 필수',    cls:'rb-ng',   text:'5/13학점 · 8학점 부족'},
-      {name:'전공 선택',    cls:'rb-warn', text:'27/42학점 · 진행중'},
-      {name:'교양 필수교과', cls:'rb-warn', text:'11/17학점 · 진행중'},
+      {name:'전공 기초',     cls:'rb-ok',   text:'12/10학점 충족'},
+      {name:'전공 필수',     cls:'rb-ng',   text:'5/13학점 · 진행중'},
+      {name:'전공 선택',     cls:'rb-warn', text:'27/42학점 · 진행중'},
+      {name:'교양 필수교과', cls:'rb-warn', text:'15/17학점 · 2학점 부족'},
       {name:'교양 배분이수', cls:'rb-ok',   text:'12/12학점 충족'},
-      {name:'교양 자유이수', cls:'rb-warn', text:'0/3학점'},
-      {name:'SW 기초교육',    cls:'rb-ok',  text:'10/6학점 충족'},
-      {name:'영어강의',       cls:'rb-ok',  text:'3/3과목 충족'},
-      {name:'한국어능력인증', cls:'rb-ok',   text:'해당없음'},
+      {name:'교양 자유이수', cls:'rb-ok',   text:'11/3학점 충족'},
+      {name:'SW 기초교육',   cls:'rb-ok',   text:'6/6학점 충족'},
+      {name:'영어강의',      cls:'rb-ok',   text:'3/3과목 충족'},
+      {name:'한국어능력인증', cls:'rb-ok',  text:'해당없음'},
       {name:'졸업능력인증',  cls:'rb-ng',   text:'필수교과 미충족'},
     ],
     treeReqs:[
       {name:'전공 필수', cls:'rb-ng', items:[
-        {dot:'rd-ok',  name:'영화촬영기초(e)',    cr:'2학점'},
-        {dot:'rd-warn',name:'캡스톤디자인1',      cr:'수강중'},
-        {dot:'rd-ng',  name:'나머지 5과목',       cr:'미이수'},
+        {dot:'rd-ok',   name:'영화촬영기초(e)',          cr:'2학점'},
+        {dot:'rd-warn', name:'캡스톤디자인1(연극영화학)', cr:'수강중'},
+        {dot:'rd-ng',   name:'나머지 필수과목',           cr:'8학점 미이수'},
       ]},
       {name:'전공 선택', cls:'rb-warn', items:[
-        {dot:'rd-ok',  name:'초급영화이론 외 6과목', cr:'27학점'},
-        {dot:'rd-warn',name:'디지털편집실습 외 1과목',cr:'수강중'},
+        {dot:'rd-ok',   name:'초급영화이론 외 6과목',       cr:'21학점'},
+        {dot:'rd-warn', name:'디지털편집실습·현대영화이론', cr:'6학점 수강중'},
       ]},
       {name:'교양 필수교과', cls:'rb-warn', items:[
-        {dot:'rd-ok',  name:'세계와시민 외 2과목',   cr:'9학점'},
-        {dot:'rd-ng',  name:'대학영어',             cr:'미이수'},
+        {dot:'rd-ok',  name:'세계와시민 외 4과목', cr:'15학점'},
+        {dot:'rd-ng',  name:'대학영어',            cr:'2학점 미이수'},
+      ]},
+      {name:'교양 배분이수', cls:'rb-ok', items:[
+        {dot:'rd-ok', name:'인문학과문화콘텐츠 외 3과목', cr:'12학점'},
       ]},
       {name:'SW 기초교육', cls:'rb-ok', items:[
-        {dot:'rd-ok', name:'음악인공지능활용 외 4과목', cr:'10학점'},
+        {dot:'rd-ok', name:'소프트웨어 인증', cr:'충족'},
       ]},
     ],
     semesters:[
-      {id:'km-1-1', label:'1학년 1학기 (2023-1)', pill:'ok', pillText:'12학점 이수완료', open:true, courses:[
-        {name:'영화사',               cr:3, area:'전공 기초',   st:'done'},
+      {id:'km-1-1', label:'1학년 1학기 (2023-1)', pill:'ok', pillText:'18학점 이수완료', open:true, courses:[
+        {name:'영화사',               cr:3, area:'전공 기초',     st:'done'},
         {name:'세계와시민',            cr:3, area:'교양 필수교과', st:'done'},
-        {name:'성찰과표현',            cr:3, area:'교양 배분이수', st:'done'},
-        {name:'인문학입문(글쓰기)',     cr:3, area:'교양 기초교과', st:'done'},
-        {name:'프랑스어1(1) · FR1011', cr:3, area:'기타',   st:'done'},
-        {name:'프랑스어1(1) · FR1013', cr:3, area:'기타',   st:'done'},
+        {name:'인문학과문화콘텐츠',    cr:3, area:'교양 배분이수', st:'done'},
+        {name:'초급프랑스어1',         cr:3, area:'기타',         st:'done'},
+        {name:'초급프랑스어회화1',     cr:3, area:'기타',         st:'done'},
+        {name:'성찰과표현',            cr:3, area:'교양 필수교과', st:'done'},
       ]},
-      {id:'km-1-2', label:'1학년 2학기 (2023-2)', pill:'ok', pillText:'13학점 이수완료', open:true, courses:[
-        {name:'인간의가치탐색',         cr:3, area:'교양 필수교과', st:'done'},
-        {name:'매체와이미지:미디어어어', cr:3, area:'기타', st:'done'},
-        {name:'GED1435',              cr:3, area:'기타', st:'done'},
-        {name:'GED1989',              cr:3, area:'기타', st:'done'},
-        {name:'프랑스어1(2) · FR1014', cr:3, area:'기타',   st:'done'},
-        {name:'SLG한국어듣기말하기1',   cr:1, area:'기타',   st:'done'},
-        {name:'SW기초교육(글쓰기)(s)',     cr:1, area:'교양 자유이수', st:'done'},
-        {name:'데이터리터러시2(e)',     cr:2, area:'교양 자유이수', st:'done'},
-        {name:'대학영어',               cr:2, area:'교양 필수교과', st:'done'},
+      {id:'km-1-2', label:'1학년 2학기 (2023-2)', pill:'ok', pillText:'18학점 이수완료', open:true, courses:[
+        {name:'인간의가치탐색',                        cr:3, area:'교양 필수교과', st:'done'},
+        {name:'취창업스쿨(진로의사결정을통한목표설정)',  cr:2, area:'기타',         st:'done'},
+        {name:'초급프랑스어회화2',                     cr:3, area:'기타',         st:'done'},
+        {name:'정치학적사유의원리',                    cr:3, area:'교양 배분이수', st:'done'},
+        {name:'고전명작과예술의문명사',                 cr:3, area:'교양 배분이수', st:'done'},
+        {name:'윈드서핑',                              cr:1, area:'교양 자유이수', st:'done'},
+        {name:'신입생워크숍2:스타트업',                 cr:2, area:'교양 자유이수', st:'done'},
+        {name:'사회봉사1',                             cr:1, area:'기타',         st:'done'},
       ]},
-      {id:'km-2-1', label:'2학년 1학기 (2024-1)', pill:'ok', pillText:'10학점 이수완료', open:false, courses:[
-        {name:'초급영화이론',           cr:3, area:'전공 선택',  st:'done'},
-        {name:'주제연구',               cr:3, area:'교양 배분이수', st:'done'},
-        {name:'프랑스어중급1 · FR2011', cr:3, area:'기타',  st:'done'},
-        {name:'SW기초교육(음악)(s)',       cr:1, area:'교양 자유이수', st:'done'},
-        {name:'SW적사고기초(s)',          cr:1, area:'교양 자유이수', st:'done'},
-        {name:'SW기초교육(기타)(s)',       cr:1, area:'교양 자유이수', st:'done'},
+      {id:'km-2-1', label:'2학년 1학기 (2024-1)', pill:'ok', pillText:'16학점 이수완료', open:false, courses:[
+        {name:'초급영화이론',            cr:3, area:'전공 선택',   st:'done'},
+        {name:'매체와메시지:미디어의이해', cr:3, area:'교양 배분이수', st:'done'},
+        {name:'이미지와사운드(e)',        cr:3, area:'전공 기초',   st:'done'},
+        {name:'주제연구',                cr:3, area:'교양 필수교과', st:'done'},
+        {name:'요트',                    cr:1, area:'교양 자유이수', st:'done'},
+        {name:'중급프랑스어1',           cr:3, area:'기타',         st:'done'},
       ]},
-      {id:'km-2-2', label:'2학년 2학기 (2024-2)', pill:'ok', pillText:'12학점 이수완료', open:false, courses:[
+      {id:'km-2-2', label:'2학년 2학기 (2024-2)', pill:'ok', pillText:'18학점 이수완료', open:false, courses:[
         {name:'빅뱅에서문명까지',        cr:3, area:'교양 필수교과', st:'done'},
-        {name:'프랑스영상예술 · FR2042',cr:3, area:'전공 선택',  st:'done'},
-        {name:'단편영화와시나리오',      cr:3, area:'전공 선택',  st:'done'},
-        {name:'이미지와사운드(e)',       cr:3, area:'전공 기초',  st:'done'},
-        {name:'문화다양성·해외연수',     cr:2, area:'기타',   st:'done'},
-        {name:'인공지능과미래사회(s)',    cr:3, area:'교양 자유이수', st:'done'},
+        {name:'프랑스영화예술',          cr:3, area:'전공 선택',   st:'done'},
+        {name:'단편영화와시나리오',      cr:3, area:'전공 선택',   st:'done'},
+        {name:'비디오제작실습',          cr:3, area:'전공 기초',   st:'done'},
+        {name:'사물인터넷과미래사회(s)', cr:3, area:'교양 자유이수', st:'done'},
+        {name:'시나리오창작기초(e)',     cr:3, area:'전공 기초',   st:'done'},
       ]},
-      {id:'km-3-1', label:'3학년 1학기 (2025-1)', pill:'ok', pillText:'14학점 이수완료', open:false, courses:[
-        {name:'영화촬영기초(e)',         cr:2, area:'전공 필수',  st:'done'},
-        {name:'시나리오창작기초(e)',      cr:3, area:'전공 기초',  st:'done'},
-        {name:'비디오제작실습',          cr:3, area:'전공 기초',  st:'done'},
-        {name:'영화편집연구',            cr:3, area:'전공 선택',  st:'done'},
-        {name:'영상마케팅',              cr:3, area:'전공 선택',  st:'done'},
-        {name:'FT3043(e)',              cr:3, area:'전공 선택',  st:'done'},
-        {name:'고급시나리오창작',        cr:3, area:'전공 선택',  st:'done'},
-        {name:'음악인공지능활용(s)',      cr:3, area:'교양 자유이수', st:'done'},
+      {id:'km-3-1', label:'3학년 1학기 (2025-1)', pill:'ok', pillText:'18학점 이수완료', open:false, courses:[
+        {name:'영화촬영기초(e)',          cr:2, area:'전공 필수',   st:'done'},
+        {name:'영화편집연구',             cr:3, area:'전공 선택',   st:'done'},
+        {name:'영상마케팅',               cr:3, area:'전공 선택',   st:'done'},
+        {name:'영화제작실습(e)',           cr:3, area:'전공 선택',   st:'done'},
+        {name:'고급시나리오창작',          cr:3, area:'전공 선택',   st:'done'},
+        {name:'소프트웨어적사유(s)',        cr:3, area:'교양 자유이수', st:'done'},
+        {name:'전공탐색및기업가정신세미나', cr:1, area:'교양 자유이수', st:'done'},
       ]},
       {id:'km-3-2', label:'3학년 2학기 (2026-1)', pill:'warn', pillText:'12학점 수강중', open:true, courses:[
-        {name:'캡스톤디자인1(연극영화학)',cr:3, area:'전공 필수',  st:'current'},
-        {name:'디지털편집실습',          cr:3, area:'전공 선택',  st:'current'},
-        {name:'현대영화이론',            cr:3, area:'전공 선택',  st:'current'},
-        {name:'고급프랑스어회화 · FR3011',cr:3,area:'기타',   st:'current'},
+        {name:'디지털편집실습',          cr:3, area:'전공 선택', st:'current'},
+        {name:'현대영화이론',            cr:3, area:'전공 선택', st:'current'},
+        {name:'고급프랑스어회화',        cr:3, area:'기타',      st:'current'},
+        {name:'캡스톤디자인1(연극영화학)', cr:3, area:'전공 필수', st:'current'},
+      ]},
+      {id:'km-4-1', label:'4학년 1학기 (2026-2)', pill:'warn', pillText:'3학점 수강예정', open:true, courses:[
+        {name:'캡스톤디자인2', cr:3, area:'전공 필수', st:'todo'},
+      ]},
+      {id:'sem-1780587194855', label:'4학년 2학기 (2027-1)', pill:'ok', pillText:'6학점 수강예정', open:true, courses:[
+        {name:'중급프랑스어1', cr:3, area:'전공 필수', st:'todo'},
+        {name:'영화비평연습',  cr:3, area:'전공 필수', st:'todo'},
       ]},
     ],
   },
@@ -1083,6 +1121,20 @@ function loadStateForStudent(name) {
 function manualSave() {
   saveState();
   toast('변경사항이 저장됐어요 ✓');
+}
+function exportData() {
+  if (!selectedName || !currentData) return;
+  const payload = {
+    name: selectedName,
+    semesters: JSON.parse(JSON.stringify(currentData.semesters)),
+    extra: JSON.parse(JSON.stringify(extraCourses))
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `growing-pots-${selectedName}-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  toast(`"${selectedName}" 데이터가 다운로드됐어요.`);
 }
 
 function resetData() {
@@ -1402,25 +1454,12 @@ function renderPlanner(forceOpen = {}) {
         <div class="sem-toggle"><svg class="s-arrow ${isOpen?'open':''}" id="arr-${sem.id}" width="10" height="10" viewBox="0 0 10 10"><path d="M3 1.5L7 5L3 8.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="sem-meta">
           <span class="sem-name">${sem.label}</span>
-          <button onclick="renameSemester('${sem.id}');event.stopPropagation()" title="학기명 수정"
-            style="border:none;background:none;cursor:pointer;font-size:11px;color:var(--tx4);padding:0 3px;flex-shrink:0;transition:color .12s;line-height:1"
-            onmouseover="this.style.color='var(--brand)'" onmouseout="this.style.color='var(--tx4)'">✏️</button>
           <span class="sem-pill ${pill.cls}" id="pill-${sem.id}">${pill.text}</span>
         </div>
-        <div style="position:relative;flex-shrink:0;margin-left:2px">
-          <button onclick="toggleBulkMenu('${sem.id}',event)" title="일괄 편집"
-            style="border:1px solid var(--border2);background:none;cursor:pointer;font-size:11px;font-family:inherit;font-weight:600;color:var(--tx3);padding:3px 8px;border-radius:5px;transition:all .12s"
-            onmouseover="this.style.background='var(--surface2)';this.style.color='var(--tx1)'"
-            onmouseout="this.style.background='none';this.style.color='var(--tx3)'">편집 ▾</button>
-          <div class="bulk-menu" id="bulk-${sem.id}">
-            <button onclick="bulkSetSemStatus('${sem.id}','done',event)">✓ 전체 이수완료</button>
-            <button onclick="bulkSetSemStatus('${sem.id}','current',event)">▶ 전체 수강중</button>
-            <button onclick="bulkSetSemStatus('${sem.id}','todo',event)">○ 전체 수강예정</button>
-          </div>
-        </div>
-        ${sem.id.startsWith('sem-') ? `<button onclick="deleteSemester('${sem.id}');event.stopPropagation()" title="학기 삭제"
-          style="border:none;background:none;cursor:pointer;font-size:14px;color:var(--tx4);padding:0 8px;flex-shrink:0;transition:color .12s"
-          onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--tx4)'">🗑</button>` : ''}
+        <button onclick="openSemModal('${sem.id}',event)" title="학기 편집"
+          style="border:1px solid var(--border2);background:none;cursor:pointer;font-size:11px;font-family:inherit;font-weight:600;color:var(--tx3);padding:3px 9px;border-radius:5px;flex-shrink:0;transition:all .12s;margin-left:4px"
+          onmouseover="this.style.background='var(--surface2)';this.style.color='var(--tx1)'"
+          onmouseout="this.style.background='none';this.style.color='var(--tx3)'">✏ 편집</button>
         <div class="sem-lbl">${isOpen?'접기':'펼치기'}</div>
       </div>
       <div class="sem-body ${isOpen?'open':''}" id="body-${sem.id}">
@@ -1867,17 +1906,52 @@ function collapseAll() {
   }
 }
 
-function renameSemester(semId) {
+let _editingSemId = null;
+
+function openSemModal(semId, e) {
+  if (e) e.stopPropagation();
   const sem = currentData?.semesters.find(s => s.id === semId);
   if (!sem) return;
-  const newLabel = prompt('학기명을 수정하세요\n예: 3학년 2학기 (2026-1)', sem.label);
-  if (!newLabel || !newLabel.trim() || newLabel.trim() === sem.label) return;
-  sem.label = newLabel.trim();
+  _editingSemId = semId;
+  document.getElementById('semModalName').value = sem.label;
+  document.getElementById('semModal').classList.add('show');
+  setTimeout(() => document.getElementById('semModalName').select(), 60);
+}
+function closeSemModal() {
+  document.getElementById('semModal').classList.remove('show');
+  _editingSemId = null;
+}
+function saveSemModal() {
+  const sem = currentData?.semesters.find(s => s.id === _editingSemId);
+  if (!sem) return closeSemModal();
+  const newLabel = document.getElementById('semModalName').value.trim();
+  if (!newLabel) { document.getElementById('semModalName').style.borderColor = 'var(--red)'; return; }
+  sem.label = newLabel;
+  closeSemModal();
   saveState();
   renderPlanner();
   renderReqView();
-  toast('"' + sem.label + '"으로 수정됐어요.');
+  toast(`"${newLabel}"으로 수정됐어요.`);
 }
+function deleteSemFromModal() {
+  const sem = currentData?.semesters.find(s => s.id === _editingSemId);
+  if (!sem) return closeSemModal();
+  const msg = sem.courses.length
+    ? `"${sem.label}" 학기를 삭제할까요?\n포함된 과목 ${sem.courses.length}개도 함께 삭제됩니다.`
+    : `"${sem.label}" 학기를 삭제할까요?`;
+  if (!confirm(msg)) return;
+  closeSemModal();
+  currentData.semesters = currentData.semesters.filter(s => s.id !== _editingSemId);
+  saveState(); refreshPanel(); renderPlanner(); renderReqView(); renderSimBar();
+  toast(`"${sem.label}" 학기가 삭제됐어요.`);
+}
+document.getElementById('semModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('semModal')) closeSemModal();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSemModal(); });
+
+// 구 renameSemester → openSemModal로 대체 (하위호환)
+function renameSemester(semId) { openSemModal(semId); }
 
 function deleteSemester(semId) {
   const sem = currentData.semesters.find(s => s.id === semId);
@@ -1926,13 +2000,15 @@ function onReqCardDragStart(e, gIdx) {
   _reqDragSrc = _reqDBData[gIdx];
   _reqDragSrcAccIdx = card ? +(card.getAttribute('data-accidx') ?? -1) : -1;
   e.dataTransfer.effectAllowed = 'move';
-  setTimeout(() => { if(card) card.style.opacity='0.35'; }, 0);
+  setTimeout(() => { if (card) card.classList.add('dragging'); }, 0);
 }
 function onReqCardDragEnd(e) {
   const el = e.target.closest('.cc');
-  if (el) el.style.opacity = '';
+  if (el) el.classList.remove('dragging');
   document.querySelectorAll('[id^="req-grid-"]').forEach(el => el.classList.remove('drop-target'));
-  document.querySelectorAll('.cc.drag-insert').forEach(el => el.classList.remove('drag-insert'));
+  document.querySelectorAll('.cc.drag-insert, .cc.drag-over').forEach(el => {
+    el.classList.remove('drag-insert'); el.classList.remove('drag-over');
+  });
   _reqDragSrc = null; _reqDragSrcAccIdx = -1; _reqDragOverGIdx = null;
 }
 function onReqAccDragOver(e, idx) {
@@ -1978,14 +2054,16 @@ function onCardDragStart(e, semId, ci) {
   if (e.target.closest('button')) { e.preventDefault(); return; }
   _dragSrc = {semId, ci};
   e.dataTransfer.effectAllowed = 'move';
-  setTimeout(() => { const el = e.target.closest('.cc'); if(el) el.style.opacity='0.35'; }, 0);
+  setTimeout(() => { const el = e.target.closest('.cc'); if (el) el.classList.add('dragging'); }, 0);
 }
 
 function onCardDragEnd(e) {
   const el = e.target.closest('.cc');
-  if (el) el.style.opacity = '';
+  if (el) el.classList.remove('dragging');
   document.querySelectorAll('.sem-courses').forEach(el => el.classList.remove('drop-target'));
-  document.querySelectorAll('.cc.drag-insert').forEach(el => el.classList.remove('drag-insert'));
+  document.querySelectorAll('.cc.drag-insert, .cc.drag-over').forEach(el => {
+    el.classList.remove('drag-insert'); el.classList.remove('drag-over');
+  });
   _dragSrc = null;
 }
 
@@ -2078,13 +2156,22 @@ function onPlanCardDrop(e, semId, ci) {
 }
 
 function onReqCardDragOverSame(e, accIdx, gIdx) {
-  if (!_reqDragSrc || _reqDragSrcAccIdx !== accIdx || _reqDragSrc._gIdx === gIdx) return;
+  if (!_reqDragSrc) return;
   e.preventDefault();
   e.stopPropagation();
-  document.querySelectorAll('.cc.drag-insert').forEach(el => el.classList.remove('drag-insert'));
+  document.querySelectorAll('.cc.drag-insert, .cc.drag-over').forEach(el => {
+    el.classList.remove('drag-insert'); el.classList.remove('drag-over');
+  });
   const el = e.target.closest('.cc');
-  if (el) el.classList.add('drag-insert');
-  _reqDragOverGIdx = gIdx;
+  if (!el || el.classList.contains('dragging')) return;
+  // 같은 아코디언 내 재정렬: drag-insert (위치 인디케이터)
+  // 다른 아코디언에서 오는 경우: drag-over (일반 호버)
+  if (_reqDragSrcAccIdx === accIdx && _reqDragSrc._gIdx !== gIdx) {
+    el.classList.add('drag-insert');
+    _reqDragOverGIdx = gIdx;
+  } else if (_reqDragSrcAccIdx !== accIdx) {
+    el.classList.add('drag-over');
+  }
 }
 
 function onReqCardDropSame(e, accIdx, gIdx) {
