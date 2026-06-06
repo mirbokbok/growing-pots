@@ -1,0 +1,2639 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Growing Pots — 졸업요건 플래너</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f7f6f2;--surface:#fff;--surface2:#f2f1ed;
+  --border:#e4e2db;--border2:#ccc9bf;
+  --tx1:#1a1814;--tx2:#3a3830;--tx3:#6e6b60;--tx4:#a09d90;
+  --brand:#2d6a4f;--brand-l:#e8f5ee;--brand-b:#a8d5bc;
+  --potato:#c8962a;--potato-l:#fef6e4;--potato-b:#f0d080;
+  --green:#16a34a;--green-bg:#f0fdf4;--green-b:#86efac;
+  --amber:#d97706;--amber-bg:#fffbeb;--amber-b:#fde68a;
+  --red:#dc2626;--red-bg:#fef2f2;--red-b:#fecaca;
+  --blue:#2563eb;--blue-bg:#eff6ff;--blue-b:#bfdbfe;
+  --r:8px;--rl:12px;
+  --sh:0 1px 3px rgba(0,0,0,.07);--shm:0 4px 16px rgba(0,0,0,.08);
+}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--tx1);background:var(--bg);-webkit-font-smoothing:antialiased;}
+
+/* ── SCREEN 시스템: display inline style로만 제어 ── */
+.screen{position:fixed;inset:0;flex-direction:column;background:var(--bg);}
+
+/* ── SCREEN 1: ONBOARDING ── */
+.ob-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;overflow-y:auto;}
+.ob-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:44px 52px;width:100%;max-width:500px;box-shadow:var(--shm);text-align:center;}
+.ob-steps{display:flex;justify-content:center;gap:8px;margin-bottom:28px;}
+.ob-step{width:28px;height:4px;border-radius:2px;background:var(--border);}
+.ob-step.active{background:var(--brand);}
+.ob-potato{margin-bottom:20px;display:flex;justify-content:center;position:relative;}
+.ob-bubble{position:absolute;top:-14px;left:50%;transform:translateX(-50%);white-space:nowrap;background:var(--potato-l);border:1.5px solid var(--potato-b);border-radius:16px;padding:6px 14px;font-size:11px;font-weight:500;color:var(--tx2);box-shadow:2px 2px 0 var(--potato-b);}
+.ob-title{font-size:23px;font-weight:700;color:var(--tx1);margin-bottom:8px;letter-spacing:-.03em;line-height:1.25;margin-top:8px;}
+.ob-sub{font-size:13px;color:var(--tx3);line-height:1.7;margin-bottom:24px;}
+.ob-fields{display:flex;flex-direction:column;gap:12px;text-align:left;margin-bottom:18px;}
+.ob-label{display:block;font-size:10px;font-weight:700;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px;}
+.ob-select,.ob-input{
+  width:100%;padding:11px 14px;border:1.5px solid var(--border2);border-radius:var(--r);
+  background:var(--surface);font-family:inherit;font-size:13px;color:var(--tx1);outline:none;
+  transition:border-color .15s,box-shadow .15s;
+}
+.ob-select{appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 7L11 1' stroke='%23a09d90' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;}
+.ob-select:focus,.ob-input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(45,106,79,.1);}
+.ob-input::placeholder{color:var(--tx4);}
+
+/* 이름 선택지 */
+
+
+/* PDF 업로드 */
+.pdf-upload{border:2px dashed var(--border2);border-radius:var(--rl);padding:18px;text-align:center;transition:border-color .2s,background .2s;position:relative;cursor:pointer;display:block;}
+.pdf-upload:hover{border-color:var(--brand);background:var(--brand-l);}
+.pdf-upload.uploaded{border-color:var(--green);background:var(--green-bg);border-style:solid;}
+.pdf-icon{font-size:26px;margin-bottom:6px;}
+.pdf-title{font-size:13px;font-weight:700;color:var(--tx2);margin-bottom:3px;}
+.pdf-sub{font-size:11px;color:var(--tx3);line-height:1.5;}
+.pdf-name{font-size:12px;font-weight:700;color:var(--green);margin-top:3px;}
+
+.ob-btn{
+  width:100%;padding:14px;border:none;border-radius:var(--r);
+  background:var(--border2);color:#fff;font-family:inherit;font-size:14px;font-weight:700;
+  cursor:not-allowed;transition:background .15s;
+}
+.ob-btn.enabled{background:var(--brand);cursor:pointer;}
+.ob-btn.enabled:hover{background:#245a40;}
+
+/* ── SCREEN 2: LOADING ── */
+.loading-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;}
+.spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-title{font-size:17px;font-weight:700;color:var(--tx1);}
+.loading-sub{font-size:13px;color:var(--tx3);}
+.loading-steps{display:flex;flex-direction:column;gap:10px;}
+.loading-step{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--tx4);}
+.loading-step.active{color:var(--tx1);font-weight:500;}
+.loading-step.done{color:var(--green);}
+.ls-icon{width:20px;height:20px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
+.loading-step.active .ls-icon{background:var(--brand);color:#fff;}
+.loading-step.done .ls-icon{background:var(--green);color:#fff;}
+
+/* ── SCREEN 3: DASHBOARD ── */
+.topbar{height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0;}
+.topbar-logo{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:var(--tx1);}
+.tb-div{width:1px;height:20px;background:var(--border);}
+.tb-bc{font-size:13px;color:var(--tx3);}
+.tb-spacer{flex:1;}
+.tb-chip{font-size:11px;font-weight:700;color:var(--brand);background:var(--brand-l);border:1px solid var(--brand-b);padding:3px 10px;border-radius:20px;}
+.tb-toggle,.back-btn{border:none;background:none;cursor:pointer;color:var(--tx3);border-radius:6px;padding:6px 10px;font-family:inherit;font-size:12px;font-weight:500;display:flex;align-items:center;gap:5px;transition:background .12s;}
+.tb-toggle{width:32px;height:32px;padding:0;justify-content:center;}
+.tb-toggle:hover,.back-btn:hover{background:var(--surface2);color:var(--tx1);}
+
+.app-body{display:flex;flex:1;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{width:276px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:width .2s;}
+.sidebar.collapsed{width:0;border:none;}
+.sb-inner{width:276px;display:flex;flex-direction:column;height:100%;overflow:hidden;}
+.sb-profile{padding:14px 16px 10px;flex-shrink:0;}
+.sb-degree{font-size:12px;font-weight:700;color:var(--tx2);margin-bottom:1px;}
+.sb-major{font-size:11px;color:var(--tx3);margin-bottom:10px;}
+.prog-row{display:flex;justify-content:space-between;margin-bottom:3px;}
+.prog-label{font-size:11px;color:var(--tx3);}
+.prog-val{font-size:11px;font-weight:700;color:var(--tx2);}
+.prog-track{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:6px;}
+.prog-fill{height:100%;border-radius:3px;}
+
+.potato-widget{margin:0 12px 8px;background:var(--potato-l);border:1px solid var(--potato-b);border-radius:var(--rl);padding:10px 12px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.pw-status{font-size:11px;font-weight:700;color:var(--potato);margin-bottom:2px;}
+.pw-desc{font-size:10px;color:#92400e;line-height:1.45;}
+
+.sb-nav{flex:1;overflow-y:auto;padding:4px 8px;}
+.nav-sec{font-size:10px;font-weight:700;color:var(--tx4);letter-spacing:.08em;text-transform:uppercase;padding:6px 8px 4px;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;color:var(--tx2);font-size:12px;font-weight:500;cursor:pointer;transition:background .12s;user-select:none;}
+.nav-item:hover{background:var(--surface2);}
+.nav-item.active{background:var(--brand-l);color:var(--brand);font-weight:700;}
+.nav-icon{font-size:13px;width:16px;text-align:center;}
+.nav-badge{margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:var(--red-bg);color:var(--red);}
+
+.req-tree{padding:4px;}
+.req-cat{margin-bottom:2px;border-radius:var(--r);overflow:hidden;border:1px solid var(--border);}
+.req-hd{display:flex;align-items:center;gap:7px;padding:7px 10px;cursor:pointer;background:var(--surface);transition:background .12s;user-select:none;}
+.req-hd:hover{background:var(--surface2);}
+.req-arrow{font-size:9px;color:var(--tx4);transition:transform .18s;}
+.req-arrow.open{transform:rotate(90deg);}
+.req-name{font-size:11px;font-weight:700;color:var(--tx2);flex:1;}
+.req-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;}
+.rb-ok{background:var(--green-bg);color:var(--green);}
+.rb-warn{background:var(--amber-bg);color:var(--amber);}
+.rb-ng{background:var(--red-bg);color:var(--red);}
+.req-body{display:none;background:var(--surface2);border-top:1px solid var(--border);}
+.req-body.open{display:block;}
+.req-item{display:flex;align-items:center;gap:6px;padding:5px 10px 5px 26px;border-bottom:1px solid var(--border);font-size:11px;color:var(--tx2);}
+.req-item:last-child{border:none;}
+.rdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.rd-ok{background:var(--green);}
+.rd-warn{background:var(--amber);}
+.rd-ng{background:var(--red);}
+.rd-none{background:var(--border2);}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.tab-bar{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;height:42px;flex-shrink:0;}
+.tab{height:100%;display:flex;align-items:center;padding:0 16px;font-size:12px;font-weight:500;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;transition:color .12s,border-color .12s;white-space:nowrap;margin-bottom:-1px;}
+.tab:hover{color:var(--tx2);}
+.tab.active{color:var(--brand);border-bottom-color:var(--brand);font-weight:700;}
+.tab-spacer{flex:1;}
+.tab-btn{font-size:12px;font-weight:700;color:#fff;background:var(--brand);border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-family:inherit;}
+.tab-btn:hover{background:#245a40;}
+
+.view{flex:1;overflow:auto;padding:20px;}
+.view-inner{max-width:700px;}
+
+.alert-box{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:var(--r);margin-bottom:16px;font-size:12px;line-height:1.5;background:var(--amber-bg);border:1px solid var(--amber-b);color:#92400e;}
+.alert-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
+
+/* SEM BLOCKS */
+.sem-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);margin-bottom:10px;overflow:hidden;box-shadow:var(--sh);}
+.sem-block.warn{border-color:var(--amber-b);}
+.sem-block.goal{border:1.5px dashed var(--green-b);background:var(--green-bg);}
+.sem-block.session{border:1.5px dashed var(--blue-b);background:var(--blue-bg);}
+.sem-pill.session{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-b);}
+.sem-hd{display:flex;align-items:center;cursor:pointer;user-select:none;transition:background .12s;}
+.sem-hd:hover{background:var(--surface2);}
+.sem-block.goal .sem-hd:hover{background:rgba(22,163,74,.05);}
+.sem-toggle{display:flex;align-items:center;justify-content:center;width:40px;height:48px;flex-shrink:0;color:var(--tx4);}
+.s-arrow{transition:transform .2s;}
+.s-arrow.open{transform:rotate(90deg);}
+.sem-meta{flex:1;padding:0 4px;display:flex;align-items:center;gap:10px;}
+.sem-name{font-size:13px;font-weight:700;color:var(--tx1);}
+.sem-name.goal-label{color:var(--green);}
+.sem-tag{font-size:10px;color:var(--tx4);}
+.sem-pill{font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;background:var(--surface2);color:var(--tx3);border:1px solid var(--border);}
+.sem-pill.ok{background:var(--green-bg);color:var(--green);border-color:var(--green-b);}
+.sem-pill.warn{background:var(--amber-bg);color:var(--amber);border-color:var(--amber-b);}
+.sem-pill.goal{background:var(--green-bg);color:var(--green);border-color:var(--green-b);}
+.sem-lbl{font-size:11px;font-weight:500;color:var(--tx4);padding:0 14px;height:48px;display:flex;align-items:center;border-left:1px solid var(--border);flex-shrink:0;pointer-events:none;}
+.sem-hd:hover .sem-lbl{color:var(--brand);}
+.sem-body{border-top:1px solid var(--border);display:none;}
+.sem-body.open{display:block;}
+.sem-block.goal .sem-body{border-top-color:var(--green-b);}
+.sem-courses{padding:8px 12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;}
+
+.cc{display:flex;flex-direction:column;gap:5px;padding:12px 13px;border-radius:8px;border:1.5px solid;min-height:84px;}
+.cc-done{background:#f0fdf4;border-color:#86efac;}
+.cc-current{background:var(--amber-bg);border-color:var(--amber-b);}
+.cc-todo{background:var(--surface2);border-color:var(--border2);border-style:dashed;opacity:.85;}
+.cc-ng{background:var(--red-bg);border-color:var(--red-b);}
+.cc-left{flex:1;}
+.cc-name{font-size:12px;font-weight:700;color:var(--tx1);line-height:1.35;}
+.cc-meta{font-size:10px;color:var(--tx3);}
+.cc-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;align-self:flex-start;margin-top:auto;}
+.cob-done{background:var(--green-bg);color:var(--green);}
+.cob-current{background:var(--amber-bg);color:var(--amber);}
+.cob-todo{background:var(--surface2);color:var(--tx3);}
+.cob-ng{background:var(--red-bg);color:var(--red);}
+
+.cc-add{display:flex;align-items:center;justify-content:center;min-height:84px;border:2px dashed var(--border2);border-radius:8px;color:var(--tx4);font-size:13px;cursor:pointer;background:none;font-family:inherit;transition:border-color .12s,color .12s;width:100%;}
+.cc-add:hover{border-color:var(--brand);color:var(--brand);}
+
+/* 시뮬레이터 바 */
+.sim-bar-wrap{margin-bottom:10px;}
+.sim-bar-label{display:flex;justify-content:space-between;margin-bottom:4px;font-size:11px;}
+.sim-bar-track{height:9px;background:#dedad2;border-radius:5px;overflow:hidden;display:flex;}
+.sim-bar-done{height:100%;background:var(--green);border-radius:5px 0 0 5px;transition:width .35s;}
+.sim-bar-current{height:100%;background:var(--amber);transition:width .35s;}
+.sim-bar-plan{height:100%;background:#b8b4ab;transition:width .35s;}
+.sem-empty{padding:20px 12px;text-align:center;color:var(--tx4);font-size:12px;}
+.goal-body{padding:16px;display:flex;align-items:center;gap:14px;}
+.gt-title{font-size:13px;font-weight:700;color:var(--green);}
+.gt-sub{font-size:11px;color:#4ade80;margin-top:3px;}
+
+/* REQ VIEW */
+.req-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);margin-bottom:12px;overflow:hidden;box-shadow:var(--sh);}
+.rc-hd{padding:11px 16px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:space-between;}
+.rc-name{font-size:13px;font-weight:700;color:var(--tx1);}
+.rc-body{padding:12px 16px;}
+.rc-row{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:12px;padding:6px 0;border-bottom:1px solid var(--border);}
+.rc-row:last-child{border:none;}
+.rc-rname{font-size:12px;color:var(--tx2);}
+.rc-cr{font-size:11px;color:var(--tx3);}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;}
+.b-ok{background:var(--green-bg);color:var(--green);}
+.b-warn{background:var(--amber-bg);color:var(--amber);}
+.b-ng{background:var(--red-bg);color:var(--red);}
+.b-blue{background:var(--blue-bg);color:var(--blue);}
+
+/* COURSES TABLE */
+.ctbl{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;box-shadow:var(--sh);width:100%;}
+.ctbl th{padding:9px 14px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--tx3);text-align:left;}
+.ctbl td{padding:8px 14px;border-bottom:1px solid var(--border);font-size:12px;color:var(--tx2);}
+.ctbl tr:last-child td{border:none;}
+.ctbl tr:hover td{background:var(--surface2);}
+
+/* PANEL */
+.panel{width:320px;flex-shrink:0;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;transition:width .22s ease,border .22s ease;position:relative;}
+.panel.collapsed{width:0;border:none;overflow:hidden;}
+.panel-resize-handle{position:absolute;left:0;top:0;width:5px;height:100%;cursor:col-resize;z-index:10;transition:background .15s;}
+.panel-resize-handle:hover,.panel-resize-handle.dragging{background:var(--brand-b);}
+.p-sec{padding:14px 16px;border-bottom:1px solid var(--border);}
+.p-sec:last-child{border:none;}
+.p-title{font-size:12px;font-weight:700;color:var(--tx1);margin-bottom:10px;}
+.p-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);}
+.p-row:last-child{border:none;}
+.p-rname{font-size:11px;color:var(--tx2);}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;}
+.stat-val{font-size:18px;font-weight:700;color:var(--tx1);line-height:1;}
+.stat-label{font-size:10px;color:var(--tx3);margin-top:2px;}
+.panel-potato{display:flex;flex-direction:column;align-items:center;padding:14px;gap:6px;}
+.pp-bubble{background:var(--surface2);border:1px solid var(--border);border-radius:10px 10px 10px 3px;padding:7px 11px;font-size:11px;color:var(--tx2);line-height:1.5;box-shadow:1px 2px 0 var(--border);max-width:210px;text-align:center;}
+.pp-label{font-size:11px;font-weight:700;color:var(--potato);margin-top:2px;}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(26,24,20,.4);z-index:300;display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
+.overlay.show{display:flex;}
+.modal{background:var(--surface);border-radius:var(--rl);width:380px;max-width:90vw;box-shadow:0 20px 40px rgba(0,0,0,.15);}
+.modal-hd{padding:16px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-size:14px;font-weight:700;color:var(--tx1);}
+.modal-x{width:26px;height:26px;border-radius:6px;border:none;background:var(--surface2);color:var(--tx3);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
+.modal-x:hover{background:var(--border);}
+.modal-bd{padding:16px 20px;}
+.f-label{font-size:11px;font-weight:700;color:var(--tx2);margin-bottom:5px;display:block;letter-spacing:.04em;text-transform:uppercase;}
+.f-input,.f-select{width:100%;padding:9px 12px;border:1.5px solid var(--border2);border-radius:var(--r);background:var(--surface);font-family:inherit;font-size:13px;color:var(--tx1);outline:none;margin-bottom:14px;}
+.f-input:focus,.f-select:focus{border-color:var(--brand);}
+.modal-ft{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
+.btn{padding:7px 16px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--border2);background:var(--surface2);color:var(--tx2);font-family:inherit;}
+.btn-p{background:var(--brand);border-color:var(--brand);color:#fff;}
+.btn-p:hover{background:#245a40;}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--tx1);color:#fff;padding:9px 18px;border-radius:8px;font-size:12px;font-weight:500;z-index:400;transition:transform .3s ease,opacity .6s ease;opacity:0;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+.sb-req-row{display:flex;align-items:center;gap:7px;padding:5px 12px;border-bottom:1px solid var(--border);font-size:11px;}
+.sb-req-row:last-child{border:none;}
+.sb-req-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.sb-req-name{flex:1;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sb-req-val{color:var(--tx4);font-size:10px;white-space:nowrap;}
+@media(max-width:900px){.sidebar,.panel{display:none;}}
+.sem-courses.drop-target{outline:2px dashed var(--brand);background:var(--brand-l);border-radius:var(--r);}
+.cc[draggable="true"]{cursor:grab;}
+.cc.drag-insert{outline:2px solid var(--brand);outline-offset:2px;background:var(--brand-l)!important;}
+</style>
+</head>
+<body>
+
+<!-- ══ SCREEN 1: ONBOARDING ══ -->
+<div class="screen" id="s1" style="display:flex;">
+  <div class="ob-wrap">
+    <div class="ob-card">
+      <div class="ob-steps"><div class="ob-step active"></div><div class="ob-step"></div></div>
+
+      <!-- 1학년 감자 (학사모만) -->
+      <div class="ob-potato">
+        <div class="ob-bubble">살다 보니 고학년이 됐어요...</div>
+        <svg width="90" height="100" viewBox="0 0 90 100">
+          <defs>
+            <radialGradient id="oc" cx="38%" cy="28%" r="68%"><stop offset="0%" stop-color="#505e7a"/><stop offset="100%" stop-color="#1a2535"/></radialGradient>
+            <radialGradient id="ob" cx="40%" cy="22%" r="72%"><stop offset="0%" stop-color="#3d5070"/><stop offset="100%" stop-color="#1a2c42"/></radialGradient>
+          </defs>
+          <rect x="25" y="42" width="40" height="22" rx="3" fill="url(#oc)"/>
+          <rect x="29" y="44" width="22" height="6" rx="2" fill="#6070a0" opacity="0.45"/>
+          <polygon points="8,42 45,26 82,42 45,58" fill="url(#ob)"/>
+          <polygon points="8,42 45,26 82,42 45,58" fill="none" stroke="#0a1520" stroke-width="1.3"/>
+          <polygon points="12,41 45,27 78,41 45,55" fill="#3a5270" opacity="0.38"/>
+          <polygon points="8,42 25,42 25,54 8,51" fill="#0d1c2c" opacity="0.32"/>
+          <rect x="55" y="42" width="4" height="22" rx="1.5" fill="#f0c000"/>
+          <circle cx="57" cy="66" r="5" fill="#e0a800"/>
+          <circle cx="57" cy="66" r="3" fill="#f8d840"/>
+          <ellipse cx="45" cy="90" rx="20" ry="4" fill="#1a1814" opacity="0.05"/>
+          <text x="45" y="84" text-anchor="middle" font-size="15" fill="#a09d90" opacity="0.3">?</text>
+        </svg>
+      </div>
+
+      <h1 class="ob-title">내 졸업요건,<br>지금 바로 확인하기</h1>
+      <p class="ob-sub">학과 정보와 졸업사정관리표 PDF를 올리면<br>별도 입력 없이 졸업요건이 자동으로 분석돼요.</p>
+
+      <div class="ob-fields">
+        <div>
+          <label class="ob-label">캠퍼스</label>
+          <select class="ob-select" id="selCampus">
+            <option value="intl" selected>경희대학교 국제캠퍼스</option>
+          </select>
+        </div>
+        <div>
+          <label class="ob-label">학과</label>
+          <select class="ob-select" id="selMajor" onchange="onFieldChange()">
+            <option value="">학과 선택</option>
+            <option value="theater">연극영화학과</option>
+            <option value="mech">기계공학과</option>
+            <option value="fashion">의상디자인학과</option>
+            <option value="design">산업디자인학과</option>
+            <option value="astro">천문학과</option>
+            <option value="digital">디지털콘텐츠학과</option>
+            <option value="food">식품생명공학과</option>
+            <option value="chemical">화학공학과</option>
+            <option value="sports">스포츠의학과</option>
+          </select>
+        </div>
+        <div>
+          <label class="ob-label">입학년도</label>
+          <select class="ob-select" id="selYear" onchange="onFieldChange()">
+            <option value="">입학년도 선택</option>
+            <option value="19">19학번 (2019년)</option>
+            <option value="20">20학번 (2020년)</option>
+            <option value="21">21학번 (2021년)</option>
+            <option value="22">22학번 (2022년)</option>
+            <option value="23">23학번 (2023년)</option>
+            <option value="24">24학번 (2024년)</option>
+            <option value="25">25학번 (2025년)</option>
+          </select>
+        </div>
+        <div>
+          <label class="ob-label">이름</label>
+          <input class="ob-input" id="inputName" type="text" placeholder="이름을 입력하세요" oninput="onNameInput(this.value)" onchange="onNameInput(this.value)"/>
+        </div>
+        <div>
+          <label class="ob-label">졸업사정관리표 PDF</label>
+          <label class="pdf-upload" id="pdfUpload" for="pdfInput">
+            <input type="file" id="pdfInput" style="position:absolute;opacity:0;width:0;height:0;overflow:hidden" onchange="onPdfSelect(this)"/>
+            <div id="pdfDefault">
+              <div class="pdf-icon">📄</div>
+              <div class="pdf-title">PDF 파일 첨부</div>
+              <div class="pdf-sub">info21 → 학적 → 졸업사정결과조회<br>→ 자료 생성 → 결과 조회</div>
+            </div>
+            <div id="pdfDone" style="display:none">
+              <div class="pdf-icon">✅</div>
+              <div class="pdf-title" style="color:var(--green)">PDF 업로드 완료</div>
+              <div class="pdf-name" id="pdfName"></div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <button class="ob-btn" id="obBtn" onclick="startAnalysis()">졸업요건 분석하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 2: LOADING ══ -->
+<div class="screen" id="s2" style="display:none;">
+  <div class="loading-wrap">
+    <svg width="80" height="52" viewBox="0 0 100 60" style="margin-bottom:4px">
+      <defs>
+        <radialGradient id="lc" cx="38%" cy="28%" r="68%"><stop offset="0%" stop-color="#505e7a"/><stop offset="100%" stop-color="#1a2535"/></radialGradient>
+        <radialGradient id="lb" cx="40%" cy="22%" r="72%"><stop offset="0%" stop-color="#3d5070"/><stop offset="100%" stop-color="#1a2c42"/></radialGradient>
+        <radialGradient id="lp" cx="40%" cy="32%" r="64%"><stop offset="0%" stop-color="#f0d470"/><stop offset="55%" stop-color="#d4a030"/><stop offset="100%" stop-color="#9a6c18"/></radialGradient>
+      </defs>
+      <rect x="22" y="6" width="56" height="16" rx="2.5" fill="url(#lc)"/>
+      <polygon points="6,6 50,0 94,6 50,18" fill="url(#lb)"/>
+      <polygon points="6,6 50,0 94,6 50,18" fill="none" stroke="#0a1520" stroke-width="1.2"/>
+      <rect x="60" y="6" width="3.5" height="14" rx="1.2" fill="#f0c000"/>
+      <circle cx="61.5" cy="22" r="3.5" fill="#e0a800"/>
+      <ellipse cx="50" cy="50" rx="38" ry="16" fill="url(#lp)"/>
+      <ellipse cx="48" cy="48" rx="34" ry="13" fill="#ddb050" opacity="0.4"/>
+      <line x1="34" y1="43" x2="39" y2="48" stroke="#3a2000" stroke-width="2" stroke-linecap="round"/>
+      <line x1="39" y1="43" x2="34" y2="48" stroke="#3a2000" stroke-width="2" stroke-linecap="round"/>
+      <line x1="57" y1="43" x2="62" y2="48" stroke="#3a2000" stroke-width="2" stroke-linecap="round"/>
+      <line x1="62" y1="43" x2="57" y2="48" stroke="#3a2000" stroke-width="2" stroke-linecap="round"/>
+      <path d="M40 54 Q50 52 60 54" fill="none" stroke="#7a5010" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <div class="spinner"></div>
+    <div class="loading-title" id="loadTitle">PDF 분석 중...</div>
+    <div class="loading-sub">잠깐만요, 졸업요건을 불러오고 있어요.</div>
+    <div class="loading-steps">
+      <div class="loading-step" id="ls1"><div class="ls-icon" id="li1">1</div>졸업사정관리표 파싱</div>
+      <div class="loading-step" id="ls2"><div class="ls-icon" id="li2">2</div>이수 과목 분류</div>
+      <div class="loading-step" id="ls3"><div class="ls-icon" id="li3">3</div>졸업요건 대조 및 검증</div>
+      <div class="loading-step" id="ls4"><div class="ls-icon" id="li4">4</div>로드맵 생성</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 3: DASHBOARD ══ -->
+<div class="screen" id="s3" style="display:none;">
+  <div class="topbar">
+    <button class="tb-toggle" onclick="toggleSB()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <rect x="1" y="3" width="14" height="1.5" rx=".75" fill="currentColor"/>
+        <rect x="1" y="7.25" width="14" height="1.5" rx=".75" fill="currentColor"/>
+        <rect x="1" y="11.5" width="14" height="1.5" rx=".75" fill="currentColor"/>
+      </svg>
+    </button>
+    <div class="topbar-logo">
+      <svg width="22" height="22" viewBox="0 0 22 22"><defs><radialGradient id="lgpt" cx="36%" cy="28%" r="65%"><stop offset="0%" stop-color="#f0d470"/><stop offset="55%" stop-color="#c8962a"/><stop offset="100%" stop-color="#9a6c18"/></radialGradient></defs><ellipse cx="11" cy="13" rx="9" ry="9" fill="url(#lgpt)"/><ellipse cx="10.5" cy="12.5" rx="8" ry="8" fill="#d4a840" opacity="0.4"/><path d="M7.5 11 Q9 8.5 10.5 11" fill="none" stroke="#2a1800" stroke-width="1.5" stroke-linecap="round"/><path d="M11.5 11.3 Q13 8.8 14.5 11.3" fill="none" stroke="#2a1800" stroke-width="1.3" stroke-linecap="round"/><path d="M7.5 15 Q11 18 14.5 15" fill="#e86050" stroke="#c04030" stroke-width="0.7"/></svg>
+      Growing Pots
+    </div>
+    <div class="tb-div"></div>
+    <span class="tb-bc" id="tbBc">졸업 플래너</span>
+    <div class="tb-spacer"></div>
+    <button class="back-btn" onclick="goBack()">← 처음으로</button>
+    <span class="tb-chip">BETA</span>
+  </div>
+
+  <div class="app-body">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sb-inner">
+        <div class="sb-profile">
+          <div class="sb-degree">경희대 국제캠퍼스</div>
+          <div class="sb-major" id="sbMajor">연극영화학과 · 23학번</div>
+          <!-- 진행 바는 우측 시뮬레이터로 이전됨 (hidden 유지로 JS 오류 방지) -->
+          <div style="display:none">
+            <div class="prog-row"><span class="prog-label">전체 이수율</span><span class="prog-val" id="progPct">-</span></div>
+            <div class="prog-track"><div class="prog-fill" id="progBar" style="width:0%;background:var(--brand)"></div></div>
+            <div class="prog-row"><span class="prog-label">잔여 학점</span><span class="prog-val" id="progRem" style="color:var(--red)">-</span></div>
+            <div class="prog-track"><div class="prog-fill" id="progRemBar" style="width:0%;background:var(--red)"></div></div>
+          </div>
+        </div>
+
+        <!-- 3학년 책가방 감자 -->
+        <div class="potato-widget">
+          <svg width="44" height="52" viewBox="0 0 100 120" style="flex-shrink:0">
+            <defs>
+              <radialGradient id="pwc" cx="38%" cy="28%" r="68%"><stop offset="0%" stop-color="#505e7a"/><stop offset="100%" stop-color="#1a2535"/></radialGradient>
+              <radialGradient id="pwb" cx="40%" cy="22%" r="72%"><stop offset="0%" stop-color="#3d5070"/><stop offset="100%" stop-color="#1a2c42"/></radialGradient>
+              <radialGradient id="pwp" cx="38%" cy="28%" r="64%"><stop offset="0%" stop-color="#f0d470"/><stop offset="50%" stop-color="#d4a030"/><stop offset="100%" stop-color="#9a6c18"/></radialGradient>
+              <radialGradient id="pwbg" cx="35%" cy="25%" r="70%"><stop offset="0%" stop-color="#6a9ee0"/><stop offset="100%" stop-color="#2a5eb0"/></radialGradient>
+            </defs>
+            <g transform="rotate(-5,50,26)"><rect x="24" y="18" width="52" height="18" rx="3" fill="url(#pwc)"/><polygon points="6,18 50,4 94,18 50,32" fill="url(#pwb)"/><polygon points="6,18 50,4 94,18 50,32" fill="none" stroke="#0a1520" stroke-width="1.2"/><rect x="61" y="18" width="4" height="18" rx="1.5" fill="#f0c000"/><circle cx="63" cy="38" r="4" fill="#e0a800"/></g>
+            <path d="M58 62 Q74 66 72 82 Q70 96 62 100" fill="none" stroke="#1e4a90" stroke-width="3.5" stroke-linecap="round"/>
+            <rect x="60" y="60" width="26" height="32" rx="6" fill="url(#pwbg)"/>
+            <rect x="63" y="76" width="20" height="13" rx="4" fill="#2a5eb0"/>
+            <line x1="64" y1="76" x2="82" y2="76" stroke="#88aadd" stroke-width="1.2" stroke-linecap="round"/>
+            <rect x="63" y="62" width="12" height="5" rx="2" fill="#8ab8f0" opacity="0.45"/>
+            <ellipse cx="46" cy="83" rx="26" ry="28" fill="url(#pwp)"/>
+            <ellipse cx="44" cy="80" rx="23" ry="25" fill="#ddb050" opacity="0.38"/>
+            <ellipse cx="37" cy="77" rx="5.5" ry="6" fill="white"/><ellipse cx="54" cy="78" rx="4.2" ry="4.8" fill="white"/>
+            <circle cx="38.5" cy="78.5" r="3.2" fill="#2a1800"/><circle cx="55.5" cy="79.5" r="2.3" fill="#2a1800"/>
+            <circle cx="40" cy="77" r="1.3" fill="white"/>
+            <path d="M38 90 Q46 93 54 90" fill="none" stroke="#7a5010" stroke-width="1.7" stroke-linecap="round"/>
+            <ellipse cx="18" cy="82" rx="7" ry="5" fill="#c89030" transform="rotate(-20 18 82)"/>
+            <ellipse cx="36" cy="110" rx="7" ry="5" fill="#b07820" transform="rotate(12 36 110)"/>
+            <ellipse cx="56" cy="112" rx="7" ry="5" fill="#b07820" transform="rotate(-12 56 112)"/>
+          </svg>
+          <div><div class="pw-status" id="pwStatus">-</div><div class="pw-desc" id="pwDesc">-</div></div>
+        </div>
+
+        <div style="padding:10px 14px 12px;border-bottom:1px solid var(--border);flex-shrink:0">
+          <div class="stat-grid">
+            <div class="stat-card"><div class="stat-val" id="statDone">-</div><div class="stat-label">이수/수강중</div></div>
+            <div class="stat-card"><div class="stat-val" id="statExp" style="color:var(--red)">-</div><div class="stat-label">남은 학점</div></div>
+            <div class="stat-card"><div class="stat-val" id="statReq">120</div><div class="stat-label">총 학점</div></div>
+            <div class="stat-card"><div class="stat-val" id="statSem" style="color:var(--amber)">-</div><div class="stat-label">잔여 학기</div></div>
+          </div>
+        </div>
+
+        <div class="sb-nav" style="padding:4px 0">
+          <div class="nav-sec">졸업요건 현황<span id="badgeCnt" style="margin-left:6px;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:var(--red-bg);color:var(--red)">-</span></div>
+          <div id="panelReqs" style="padding:0 8px"><!-- JS로 채움 --></div>
+        </div>
+        <div style="border-top:1px solid var(--border);padding:8px 16px;flex-shrink:0">
+          <button onclick="resetData()"
+            style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:10px;color:var(--tx4);padding:0;transition:color .12s"
+            onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--tx4)'">
+            데이터 초기화
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <div class="tab-bar">
+        <div class="tab active" id="tab-requirements" onclick="switchTab('requirements')">졸업요건</div>
+        <div class="tab" id="tab-planner" onclick="switchTab('planner')">학기 플래너</div>
+        <div class="tab-spacer"></div>
+        <span id="saveIndicator" style="font-size:11px;color:var(--green);font-weight:600;opacity:0;transition:opacity .4s;margin-right:8px">저장됨 ✓</span>
+        <button id="collapseAllBtn" onclick="collapseAll()" title="모두 접기"
+          style="margin-right:6px;padding:6px 8px;border:1.5px solid var(--border2);border-radius:6px;background:none;cursor:pointer;display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx3);font-family:inherit;font-weight:500;transition:background .12s,color .12s"
+          onmouseover="this.style.background='var(--surface2)';this.style.color='var(--tx1)'"
+          onmouseout="this.style.background='none';this.style.color='var(--tx3)'">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 4.5L6.5 1L11 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><line x1="1" y1="6.5" x2="12" y2="6.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M2 8.5L6.5 12L11 8.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          모두 접기
+        </button>
+        <button onclick="openMasterDB()" style="margin-right:6px;padding:6px 12px;border:1.5px solid var(--border2);border-radius:6px;background:none;font-size:11px;color:var(--tx3);cursor:pointer;font-family:inherit;font-weight:500;transition:background .12s,color .12s" onmouseover="this.style.background='var(--surface2)';this.style.color='var(--tx1)'" onmouseout="this.style.background='none';this.style.color='var(--tx3)'">📋 전체 과목</button>
+        <button class="tab-btn" onclick="openModal()">+ 과목 추가</button>
+        <button onclick="manualSave()" style="margin-left:6px;padding:6px 10px;border:1.5px solid var(--border2);border-radius:6px;background:none;font-size:11px;color:var(--tx3);cursor:pointer;font-family:inherit" title="저장">저장</button>
+        <button id="simToggleBtn" onclick="togglePanel()" title="플래닝 시뮬레이터"
+          style="margin-left:6px;padding:6px 10px;border:1.5px solid var(--border2);border-radius:6px;background:none;font-size:11px;color:var(--tx3);cursor:pointer;font-family:inherit;font-weight:500;display:none;transition:background .12s,color .12s,border-color .12s"
+          onmouseover="this.style.background='var(--surface2)';this.style.color='var(--tx1)'"
+          onmouseout="this.style.background='none';this.style.color='var(--tx3)'">시뮬레이터 ▶</button>
+      </div>
+
+      <div id="view-planner" style="display:none;flex:1;overflow:hidden;">
+        <div class="view"><div class="view-inner" id="plannerContent"><!-- JS로 채움 --></div></div>
+      </div>
+      <div id="view-requirements" style="display:flex;flex:1;overflow:hidden;">
+        <div class="view"><div id="reqContent" style="max-width:720px"><!-- JS로 채움 --></div></div>
+      </div>
+      <div id="view-masterdb" style="display:none;flex:1;overflow:hidden;flex-direction:column;">
+        <div style="height:42px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px;flex-shrink:0;">
+          <button class="back-btn" onclick="closeMasterDB()">← 돌아가기</button>
+          <div style="width:1px;height:20px;background:var(--border)"></div>
+          <span style="font-size:13px;font-weight:700;color:var(--tx1)">전체 이수 과목</span>
+        </div>
+        <div class="view"><div class="view-inner" id="masterdbContent"><!-- JS로 채움 --></div></div>
+      </div>
+    </main>
+
+    <!-- RIGHT PANEL -->
+    <aside class="panel collapsed">
+      <div class="panel-resize-handle" id="panelResizeHandle"></div>
+      <!-- 플래닝 시뮬레이터 -->
+      <div class="p-sec">
+        <div class="p-title">플래닝 시뮬레이터</div>
+        <div id="simBars"><!-- JS로 채움 --></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="modal">
+  <div class="modal">
+    <div class="modal-hd"><span class="modal-title">과목 추가</span><button class="modal-x" onclick="closeModal()">✕</button></div>
+    <div class="modal-bd">
+      <label class="f-label">과목명</label><input type="text" class="f-input" id="mName" placeholder="예: 영화제작실습2"/>
+      <label class="f-label">학점</label>
+      <select class="f-select" id="mCr" onchange="onCrChange(this)" style="margin-bottom:6px"><option value="1">1학점</option><option value="2">2학점</option><option value="3" selected>3학점</option><option value="custom">직접 입력</option></select>
+      <input type="number" class="f-input" id="mCrCustom" placeholder="학점 수 입력 (예: 6)" min="1" max="30" style="display:none;margin-bottom:14px"/>
+      <label class="f-label">영역</label>
+      <div id="mAreaChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px"></div>
+      <input type="hidden" id="mArea" value="전공 기초"/>
+      <label class="f-label">이수 상태</label><select class="f-select" id="mSt"><option value="done">이수 완료</option><option value="current">수강 중</option><option value="todo">수강 예정</option></select>
+      <div id="mSemRow" style="display:none">
+        <label class="f-label">수강 학기</label><select class="f-select" id="mSem" style="margin:0"></select>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" id="mDelBtn" onclick="deleteCourse()" style="display:none;color:var(--red);border-color:var(--red-b);margin-right:auto">삭제</button>
+      <button class="btn" onclick="closeModal()">취소</button>
+      <button class="btn btn-p" onclick="addCourse()">추가하기</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════
+// 더미 데이터
+// ══════════════════════════════════════
+const DB = {
+
+  '김수영': {
+    major:'연극영화학과(영화트랙)', year:'23학번', totalRequired:120,
+    progress:92, totalDone:110, totalCurrent:0, remainSem:1,
+    alert:'이번 학기 캡스톤 하나만 끝내면 졸업요건 충족이에요! 거의 다 왔어요 🎓',
+    reqs:[
+      {name:'전공 기초',    cls:'rb-ok',   text:'15/10학점 충족'},
+      {name:'전공 필수',    cls:'rb-warn', text:'9/13학점 · 캡스톤 수강예정', skipDynamic:true},
+      {name:'전공 선택',    cls:'rb-warn', text:'30/42학점 · 진행중',        skipDynamic:true},
+      {name:'교양 필수교과', cls:'rb-ok',  text:'17/17학점 충족'},
+      {name:'교양 배분이수', cls:'rb-ok',  text:'18/12학점 충족'},
+      {name:'교양 자유이수', cls:'rb-ok',  text:'13/3학점 충족'},
+      {name:'SW 기초교육',    cls:'rb-warn', text:'4/6학점 · 2학점 부족'},
+      {name:'영어강의',       cls:'rb-ok',  text:'5/3과목 충족'},
+      {name:'한국어능력인증', cls:'rb-ok',  text:'해당없음'},
+      {name:'졸업능력인증',  cls:'rb-warn', text:'캡스톤 이수 후 가능'},
+    ],
+    treeReqs:[
+      {name:'전공 필수', cls:'rb-warn', items:[
+        {dot:'rd-ok',  name:'극장스태프와무대미술',  cr:'1학점'},
+        {dot:'rd-ok',  name:'영화촬영기초(e)',      cr:'2학점'},
+        {dot:'rd-ok',  name:'디지털다큐멘터리제작', cr:'3학점'},
+        {dot:'rd-ok',  name:'영화비평연습',         cr:'3학점'},
+        {dot:'rd-warn',name:'캡스톤디자인1',        cr:'수강예정'},
+      ]},
+      {name:'전공 선택', cls:'rb-warn', items:[
+        {dot:'rd-ok',  name:'디지털편집실습 외 10과목', cr:'30학점'},
+        {dot:'rd-warn',name:'잔여 전공선택',           cr:'12학점 부족'},
+      ]},
+      {name:'교양 필수교과', cls:'rb-ok', items:[
+        {dot:'rd-ok', name:'세계와시민·빅뱅 외 4과목', cr:'17학점'},
+      ]},
+      {name:'SW 기초교육', cls:'rb-ok', items:[
+        {dot:'rd-ok', name:'소프트웨어적사유(s)',     cr:'3학점'},
+        {dot:'rd-ok', name:'소프트웨어가치탐구(s)',   cr:'1학점'},
+      ]},
+    ],
+    semesters:[
+      {id:'sy-1-1', label:'1학년 1학기 (2023-1)', pill:'ok', pillText:'18학점 이수완료', open:false, courses:[
+        {name:'세계와시민',                 cr:3, area:'교양 필수교과', st:'done'},
+        {name:'대학영어',                   cr:2, area:'교양 필수교과', st:'done'},
+        {name:'성찰과표현',                 cr:3, area:'교양 필수교과', st:'done'},
+        {name:'소프트웨어가치탐구(s)',          cr:1, area:'기타',     st:'done'},
+        {name:'극장스태프와무대미술',        cr:1, area:'전공 필수',    st:'done'},
+        {name:'이미지와사운드(e)',           cr:3, area:'전공 기초',    st:'done', isEnglishLecture:true},
+        {name:'영화사',                     cr:3, area:'전공 기초',    st:'done'},
+        {name:'희곡문헌과연기(e)',           cr:2, area:'전공 기초',    st:'done', isEnglishLecture:true},
+      ]},
+      {id:'sy-1-2', label:'1학년 2학기 (2023-2)', pill:'ok', pillText:'19학점 이수완료', open:false, courses:[
+        {name:'빅뱅에서문명까지',            cr:3, area:'교양 필수교과', st:'done'},
+        {name:'인간의가치탐색',              cr:3, area:'교양 필수교과', st:'done'},
+        {name:'미디어아트와문화',            cr:3, area:'교양 배분이수', st:'done'},
+        {name:'디지털사진촬영과표현',        cr:3, area:'교양 배분이수', st:'done'},
+        {name:'전공탐색및기업과정신세미나',   cr:1, area:'교양 자유이수', st:'done'},
+        {name:'시나리오창작기초(e)',          cr:3, area:'전공 기초',    st:'done', isEnglishLecture:true},
+        {name:'비디오제작실습',              cr:3, area:'전공 기초',    st:'done'},
+      ]},
+      {id:'sy-2-1', label:'2학년 1학기 (2024-1)', pill:'ok', pillText:'14학점 이수완료', open:false, courses:[
+        {name:'인간행동의이해:심리학',       cr:3, area:'교양 배분이수', st:'done'},
+        {name:'여행을통한인간삶의가치증진',   cr:3, area:'교양 배분이수', st:'done'},
+        {name:'청춘을위한영화예찬',          cr:3, area:'교양 배분이수', st:'done'},
+        {name:'영화촬영기초(e)',             cr:2, area:'전공 필수',    st:'done', isEnglishLecture:true},
+        {name:'디지털편집실습',              cr:3, area:'전공 선택',    st:'done'},
+      ]},
+      {id:'sy-2-2', label:'2학년 2학기 (2024-2)', pill:'ok', pillText:'12학점 이수완료', open:false, courses:[
+        {name:'행복한여가를위한야외활동',     cr:1, area:'교양 자유이수', st:'done'},
+        {name:'디지털다큐멘터리제작',        cr:3, area:'전공 필수',    st:'done'},
+        {name:'단편영화와시나리오',          cr:3, area:'전공 선택',    st:'done'},
+        {name:'현대영화연구',               cr:3, area:'전공 선택',    st:'done'},
+        {name:'연극워크숍(e)',              cr:2, area:'전공 선택',    st:'done', isEnglishLecture:true},
+      ]},
+      {id:'sy-3-1', label:'3학년 1학기 (2025-1)', pill:'ok', pillText:'15학점 이수완료', open:false, courses:[
+        {name:'사회혁신2(교양)',            cr:3, area:'교양 배분이수', st:'done'},
+        {name:'사회혁신1(교양)',            cr:6, area:'교양 자유이수', st:'done'},
+        {name:'사회혁신(전공)',             cr:6, area:'전공 선택', st:'done'},
+      ]},
+      {id:'sy-3-2', label:'3학년 2학기 (2025-2)', pill:'ok', pillText:'16학점 이수완료', open:false, courses:[
+        {name:'주제연구',                   cr:3, area:'교양 필수교과', st:'done'},
+        {name:'독립연구1',                  cr:2, area:'교양 자유이수', st:'done'},
+        {name:'소프트웨어적사유(s)',           cr:3, area:'교양 자유이수', st:'done'},
+        {name:'사회봉사1',                  cr:1, area:'기타',     st:'done'},
+        {name:'영화비평연습',               cr:3, area:'전공 필수',    st:'done'},
+        {name:'TV-CM/뮤직비디오제작실습',   cr:2, area:'전공 선택',    st:'done'},
+        {name:'장면구성과연출',             cr:2, area:'전공 선택',    st:'done'},
+      ]},
+      {id:'sy-4-1', label:'4학년 1학기 (2026-1)', pill:'warn', pillText:'15학점 이수완료 · 캡스톤 수강예정', open:true, courses:[
+        {name:'캡스톤디자인1(연극영화학)',   cr:3, area:'전공 필수',    st:'todo'},
+        {name:'초급영화이론',               cr:3, area:'전공 선택',    st:'todo'},
+        {name:'현대영화이론',               cr:3, area:'전공 선택',    st:'todo'},
+        {name:'영화편집연구',               cr:3, area:'전공 선택',    st:'todo'},
+        {name:'영상마케팅',                 cr:3, area:'전공 선택',    st:'todo'},
+        {name:'고급시나리오창작',           cr:3, area:'전공 선택',    st:'todo'},
+      ]},
+    ],
+  },
+
+  '김경민': {
+    major:'연극영화학과(영화트랙)', year:'23학번', totalRequired:120,
+    progress:37, totalDone:44, totalCurrent:12, remainSem:2,
+    alert:'지금 캡스톤도 듣고 있잖아요! 대학영어랑 전공필수 조금 남았는데, 하나씩 채워봐요 💪',
+    reqs:[
+      {name:'전공 기초',    cls:'rb-ok',   text:'12/10학점 충족'},
+      {name:'전공 필수',    cls:'rb-ng',   text:'5/13학점 · 8학점 부족'},
+      {name:'전공 선택',    cls:'rb-warn', text:'27/42학점 · 진행중'},
+      {name:'교양 필수교과', cls:'rb-warn', text:'11/17학점 · 진행중'},
+      {name:'교양 배분이수', cls:'rb-ok',   text:'12/12학점 충족'},
+      {name:'교양 자유이수', cls:'rb-warn', text:'0/3학점'},
+      {name:'SW 기초교육',    cls:'rb-ok',  text:'10/6학점 충족'},
+      {name:'영어강의',       cls:'rb-ok',  text:'3/3과목 충족'},
+      {name:'한국어능력인증', cls:'rb-ok',   text:'해당없음'},
+      {name:'졸업능력인증',  cls:'rb-ng',   text:'필수교과 미충족'},
+    ],
+    treeReqs:[
+      {name:'전공 필수', cls:'rb-ng', items:[
+        {dot:'rd-ok',  name:'영화촬영기초(e)',    cr:'2학점'},
+        {dot:'rd-warn',name:'캡스톤디자인1',      cr:'수강중'},
+        {dot:'rd-ng',  name:'나머지 5과목',       cr:'미이수'},
+      ]},
+      {name:'전공 선택', cls:'rb-warn', items:[
+        {dot:'rd-ok',  name:'초급영화이론 외 6과목', cr:'27학점'},
+        {dot:'rd-warn',name:'디지털편집실습 외 1과목',cr:'수강중'},
+      ]},
+      {name:'교양 필수교과', cls:'rb-warn', items:[
+        {dot:'rd-ok',  name:'세계와시민 외 2과목',   cr:'9학점'},
+        {dot:'rd-ng',  name:'대학영어',             cr:'미이수'},
+      ]},
+      {name:'SW 기초교육', cls:'rb-ok', items:[
+        {dot:'rd-ok', name:'음악인공지능활용 외 4과목', cr:'10학점'},
+      ]},
+    ],
+    semesters:[
+      {id:'km-1-1', label:'1학년 1학기 (2023-1)', pill:'ok', pillText:'12학점 이수완료', open:true, courses:[
+        {name:'영화사',               cr:3, area:'전공 기초',   st:'done'},
+        {name:'세계와시민',            cr:3, area:'교양 필수교과', st:'done'},
+        {name:'성찰과표현',            cr:3, area:'교양 배분이수', st:'done'},
+        {name:'인문학입문(글쓰기)',     cr:3, area:'교양 기초교과', st:'done'},
+        {name:'프랑스어1(1) · FR1011', cr:3, area:'기타',   st:'done'},
+        {name:'프랑스어1(1) · FR1013', cr:3, area:'기타',   st:'done'},
+      ]},
+      {id:'km-1-2', label:'1학년 2학기 (2023-2)', pill:'ok', pillText:'13학점 이수완료', open:true, courses:[
+        {name:'인간의가치탐색',         cr:3, area:'교양 필수교과', st:'done'},
+        {name:'매체와이미지:미디어어어', cr:3, area:'기타', st:'done'},
+        {name:'GED1435',              cr:3, area:'기타', st:'done'},
+        {name:'GED1989',              cr:3, area:'기타', st:'done'},
+        {name:'프랑스어1(2) · FR1014', cr:3, area:'기타',   st:'done'},
+        {name:'SLG한국어듣기말하기1',   cr:1, area:'기타',   st:'done'},
+        {name:'SW기초교육(글쓰기)(s)',     cr:1, area:'교양 자유이수', st:'done'},
+        {name:'데이터리터러시2(e)',     cr:2, area:'교양 자유이수', st:'done'},
+        {name:'대학영어',               cr:2, area:'교양 필수교과', st:'done'},
+      ]},
+      {id:'km-2-1', label:'2학년 1학기 (2024-1)', pill:'ok', pillText:'10학점 이수완료', open:false, courses:[
+        {name:'초급영화이론',           cr:3, area:'전공 선택',  st:'done'},
+        {name:'주제연구',               cr:3, area:'교양 배분이수', st:'done'},
+        {name:'프랑스어중급1 · FR2011', cr:3, area:'기타',  st:'done'},
+        {name:'SW기초교육(음악)(s)',       cr:1, area:'교양 자유이수', st:'done'},
+        {name:'SW적사고기초(s)',          cr:1, area:'교양 자유이수', st:'done'},
+        {name:'SW기초교육(기타)(s)',       cr:1, area:'교양 자유이수', st:'done'},
+      ]},
+      {id:'km-2-2', label:'2학년 2학기 (2024-2)', pill:'ok', pillText:'12학점 이수완료', open:false, courses:[
+        {name:'빅뱅에서문명까지',        cr:3, area:'교양 필수교과', st:'done'},
+        {name:'프랑스영상예술 · FR2042',cr:3, area:'전공 선택',  st:'done'},
+        {name:'단편영화와시나리오',      cr:3, area:'전공 선택',  st:'done'},
+        {name:'이미지와사운드(e)',       cr:3, area:'전공 기초',  st:'done'},
+        {name:'문화다양성·해외연수',     cr:2, area:'기타',   st:'done'},
+        {name:'인공지능과미래사회(s)',    cr:3, area:'교양 자유이수', st:'done'},
+      ]},
+      {id:'km-3-1', label:'3학년 1학기 (2025-1)', pill:'ok', pillText:'14학점 이수완료', open:false, courses:[
+        {name:'영화촬영기초(e)',         cr:2, area:'전공 필수',  st:'done'},
+        {name:'시나리오창작기초(e)',      cr:3, area:'전공 기초',  st:'done'},
+        {name:'비디오제작실습',          cr:3, area:'전공 기초',  st:'done'},
+        {name:'영화편집연구',            cr:3, area:'전공 선택',  st:'done'},
+        {name:'영상마케팅',              cr:3, area:'전공 선택',  st:'done'},
+        {name:'FT3043(e)',              cr:3, area:'전공 선택',  st:'done'},
+        {name:'고급시나리오창작',        cr:3, area:'전공 선택',  st:'done'},
+        {name:'음악인공지능활용(s)',      cr:3, area:'교양 자유이수', st:'done'},
+      ]},
+      {id:'km-3-2', label:'3학년 2학기 (2026-1)', pill:'warn', pillText:'12학점 수강중', open:true, courses:[
+        {name:'캡스톤디자인1(연극영화학)',cr:3, area:'전공 필수',  st:'current'},
+        {name:'디지털편집실습',          cr:3, area:'전공 선택',  st:'current'},
+        {name:'현대영화이론',            cr:3, area:'전공 선택',  st:'current'},
+        {name:'고급프랑스어회화 · FR3011',cr:3,area:'기타',   st:'current'},
+      ]},
+    ],
+  },
+
+  '신현우': {
+    major:'화학공학과', year:'19학번', totalRequired:130,
+    progress:61, totalDone:79, totalCurrent:0, remainSem:4, academicStatus:'재학',
+    alert:'전공 과목이 꽤 남아있어요. 전산인증이랑 SW 기초교육도 챙겨야 해요 — 하나씩 해봐요!',
+    reqs:[
+      {name:'전공 기초',    cls:'rb-ok',   text:'21/21학점 충족'},
+      {name:'전공 필수',    cls:'rb-warn', text:'6/18학점 · 12학점 부족'},
+      {name:'전공 선택',    cls:'rb-warn', text:'18/39학점 · 21학점 부족'},
+      {name:'교양 필수교과', cls:'rb-ok',   text:'17/17학점 충족', skipDynamic:true},
+      {name:'교양 배분이수', cls:'rb-ok',   text:'12/12학점 충족'},
+      {name:'교양 자유이수', cls:'rb-ok',   text:'5/3학점 충족'},
+      {name:'영어강의',       cls:'rb-ok',  text:'6/3과목 충족'},
+      {name:'SW 기초교육',    cls:'rb-ng',  text:'0/6학점'},
+      {name:'전산인증',       cls:'rb-ng',  text:'미취득'},
+      {name:'한국어능력인증', cls:'rb-ok',   text:'해당없음'},
+      {name:'졸업능력인증',   cls:'rb-ng',  text:'불합격'},
+    ],
+    treeReqs:[
+      {name:'전공 필수', cls:'rb-ng', items:[
+        {dot:'rd-ok',  name:'화공기초실험및설계',   cr:'3학점'},
+        {dot:'rd-ok',  name:'화공유체역학',          cr:'3학점'},
+        {dot:'rd-ng',  name:'미이수 전공필수',      cr:'18학점 부족'},
+      ]},
+      {name:'전공 선택', cls:'rb-ng', items:[
+        {dot:'rd-ok',  name:'화공양론·유기화학 외 4과목', cr:'18학점'},
+        {dot:'rd-ng',  name:'잔여 전공선택',        cr:'27학점 부족'},
+      ]},
+      {name:'교양 필수교과', cls:'rb-warn', items:[
+        {dot:'rd-ok',  name:'세계와시민·인간의가치탐색 외 3과목', cr:'14학점'},
+        {dot:'rd-warn',name:'잔여 교양필수',        cr:'1학점 부족'},
+      ]},
+      {name:'교양 자유이수', cls:'rb-ok', items:[
+        {dot:'rd-ok', name:'소프트웨어적사유 외 2과목', cr:'5학점 이수·충족'},
+      ]},
+      {name:'졸업인증', cls:'rb-ng', items:[
+        {dot:'rd-ok',  name:'대학영어(e)',           cr:'2학점'},
+        {dot:'rd-ok',  name:'일반생물(e)',           cr:'3학점'},
+        {dot:'rd-ok',  name:'화공기초실험및설계(e)', cr:'3학점'},
+        {dot:'rd-ok',  name:'화공양론(e)',           cr:'3학점'},
+        {dot:'rd-ok',  name:'물리화학1(e)',          cr:'3학점'},
+        {dot:'rd-ok',  name:'무기화학(e)',           cr:'3학점'},
+        {dot:'rd-ng',  name:'전산인증',             cr:'미취득'},
+      ]},
+    ],
+    semesters:[
+      {id:'hw-1-1', label:'1학년 1학기 (2023-1)', pill:'ok', pillText:'21학점 이수완료', open:false, courses:[
+        {name:'세계와시민',                  cr:3, area:'교양 필수교과', st:'done'},
+        {name:'인간의가치탐색',              cr:3, area:'교양 필수교과', st:'done'},
+        {name:'과학예술문화의만남',          cr:3, area:'교양 배분이수', st:'done'},
+        {name:'미분적분학',                  cr:3, area:'전공 기초',    st:'done'},
+        {name:'화학1',                      cr:3, area:'전공 기초',    st:'done'},
+        {name:'일반물리',                    cr:3, area:'전공 기초',    st:'done'},
+        {name:'화학공학입문',                cr:3, area:'전공 기초',    st:'done'},
+      ]},
+      {id:'hw-1-2', label:'1학년 2학기 (2023-2)', pill:'ok', pillText:'16학점 이수완료', open:false, courses:[
+        {name:'성찰과표현',                  cr:3, area:'교양 필수교과', st:'done'},
+        {name:'현대사회와과학',              cr:3, area:'교양 배분이수', st:'done'},
+        {name:'전공탐색및기업과정신세미나',   cr:1, area:'교양 자유이수', st:'done'},
+        {name:'화학2',                      cr:3, area:'전공 기초',    st:'done'},
+        {name:'일반생물(e)',                 cr:3, area:'전공 기초',    st:'done'},
+        {name:'공학수학',                    cr:3, area:'전공 기초',    st:'done'},
+      ]},
+      {id:'hw-2-1', label:'2학년 1학기 (2024-1)', pill:'ok', pillText:'21학점 이수완료', open:false, courses:[
+        {name:'주제연구',                    cr:3, area:'교양 필수교과', st:'done'},
+        {name:'생명의언어',                  cr:3, area:'교양 배분이수', st:'done'},
+        {name:'글로벌라틴아메리카',          cr:3, area:'교양 배분이수', st:'done'},
+        {name:'화공기초실험및설계(e)',        cr:3, area:'전공 필수',    st:'done'},
+        {name:'화공양론(e)',                  cr:3, area:'전공 선택',    st:'done'},
+        {name:'유기화학',                    cr:3, area:'전공 선택',    st:'done'},
+        {name:'분析화학',                    cr:3, area:'전공 선택',    st:'done'},
+      ]},
+      {id:'hw-2-2', label:'2학년 2학기 (2024-2)', pill:'ok', pillText:'18학점 이수완료', open:false, courses:[
+        {name:'대학영어(e)',                 cr:2, area:'교양 필수교과', st:'done'},
+        {name:'소프트웨어적사유(s)',            cr:3, area:'교양 자유이수', st:'done'},
+        {name:'지구를생각하는인공지능',      cr:1, area:'교양 자유이수', st:'done'},
+        {name:'화공유체역학',                cr:3, area:'전공 필수',    st:'done'},
+        {name:'물리화학1(e)',                cr:3, area:'전공 선택',    st:'done'},
+        {name:'고분자개론',                 cr:3, area:'전공 선택',    st:'done'},
+        {name:'무기화학(e)',                 cr:3, area:'전공 선택',    st:'done'},
+      ]},
+      {id:'hw-3-2', label:'하계 계절학기 (2025)', pill:'session', pillText:'3학점 · 학점교류', open:true, courses:[
+        {name:'파이썬기초(학점교류)',        cr:3, area:'기타',     st:'done', isExchangeCredit:true},
+      ]},
+    ],
+  },
+
+  '김채은': {
+    major:'스포츠의학과', year:'24학번', totalRequired:120,
+    progress:37, totalDone:44, totalCurrent:18, remainSem:5, academicStatus:'재학',
+    alert:'실기 교과랑 교양 학점이 아직 남아있어요. 차근차근 로드맵 세우면 할 수 있어요 💡',
+    reqs:[
+      {name:'전공 기초',    cls:'rb-warn', text:'6/7학점 · 1학점 부족'},
+      {name:'전공 필수',    cls:'rb-ok',   text:'9/9학점 충족', skipDynamic:true},
+      {name:'전공 선택',    cls:'rb-ng',   text:'15/51학점 · 36학점 부족'},
+      {name:'교양 필수교과', cls:'rb-ng',   text:'12/17학점 · 5학점 부족'},
+      {name:'교양 배분이수', cls:'rb-ng',   text:'3/9학점 · 1/3개 영역 이수'},
+      {name:'교양 자유이수', cls:'rb-ok',   text:'5/3학점 충족'},
+      {name:'영어강의',       cls:'rb-ok',  text:'7/3과목 충족'},
+      {name:'SW 기초교육',    cls:'rb-ng',  text:'0/6학점'},
+      {name:'한국어능력인증', cls:'rb-ok',   text:'해당없음'},
+      {name:'졸업능력인증',   cls:'rb-ng',  text:'불합격'},
+    ],
+    treeReqs:[
+      {name:'전공 선택', cls:'rb-ng', items:[
+        {dot:'rd-ok',  name:'전공선택 기이수',   cr:'15학점'},
+        {dot:'rd-ng',  name:'잔여 전공선택',     cr:'36학점 부족'},
+      ]},
+      {name:'교양 필수교과', cls:'rb-ng', items:[
+        {dot:'rd-ok',  name:'기이수 교양필수',              cr:'12학점'},
+        {dot:'rd-ng',  name:'잔여 교양필수',               cr:'5학점 부족'},
+      ]},
+      {name:'교양 배분이수', cls:'rb-ng', items:[
+        {dot:'rd-ok',  name:'불교와정신분석학 (상징·문화·소통)', cr:'3학점 · 1개 영역'},
+        {dot:'rd-ng',  name:'미이수 (2개 영역 추가 필요)',   cr:'6학점 부족'},
+      ]},
+      {name:'체육대학 특수요건', cls:'rb-ng', items:[
+        {dot:'rd-ng',  name:'전문실기',          cr:'2/4학점'},
+        {dot:'rd-ng',  name:'맨손체조',          cr:'미이수'},
+      ]},
+      {name:'졸업인증', cls:'rb-ng', items:[
+        {dot:'rd-ng',  name:'졸업논문',          cr:'미취득'},
+        {dot:'rd-ng',  name:'외국어인증',        cr:'미통과'},
+        {dot:'rd-ng',  name:'전산인증',          cr:'미통과'},
+      ]},
+    ],
+    semesters:[
+      {id:'ce-1-1', label:'1학년 1학기 (2024-1)', pill:'ok', pillText:'6학점 이수완료', open:false, courses:[
+        {name:'빅뱅에서문명까지',              cr:3, area:'교양 필수교과', st:'done'},
+        {name:'전문실기3',                    cr:2, area:'전공 선택',    st:'done', isGraduationRequired:true},
+        {name:'전공탐색및기업과정신세미나',     cr:1, area:'교양 자유이수', st:'done'},
+      ]},
+      {id:'ce-1-2', label:'1학년 2학기 (2024-2)', pill:'ok', pillText:'17학점 이수완료', open:false, courses:[
+        {name:'인간의가치탐색',               cr:3, area:'교양 필수교과', st:'done'},
+        {name:'세계와시민',                   cr:3, area:'교양 필수교과', st:'done'},
+        {name:'동계스포츠:스키',              cr:1, area:'교양 자유이수', st:'done'},
+        {name:'스포츠테이핑실습',             cr:1, area:'전공 선택',    st:'done'},
+        {name:'해부생리학',                   cr:3, area:'전공 기초',    st:'done'},
+        {name:'스포츠심리학',                 cr:3, area:'전공 기초',    st:'done'},
+        {name:'현대사회와스포츠',             cr:3, area:'교양 배분이수', st:'done'},
+      ]},
+      {id:'ce-2-1', label:'2학년 1학기 (2025-1)', pill:'ok', pillText:'12학점 이수완료', open:false, courses:[
+        {name:'인터넷과메타버스',              cr:3, area:'교양 자유이수', st:'done'},
+        {name:'미분적분학',                   cr:3, area:'기타',     st:'done'},
+        {name:'운동생리학',                   cr:3, area:'전공 필수',    st:'done'},
+        {name:'스포츠재활론',                 cr:3, area:'전공 선택',    st:'done'},
+      ]},
+      {id:'ce-2-2', label:'2학년 2학기 (2025-2)', pill:'ok', pillText:'18학점 이수완료', open:false, courses:[
+        {name:'성찰과표현',                   cr:3, area:'교양 필수교과', st:'done'},
+        {name:'기초전자회로',                 cr:3, area:'기타',     st:'done'},
+        {name:'기능해부학',                   cr:3, area:'전공 필수',    st:'done'},
+        {name:'운동생화학',                   cr:3, area:'전공 선택',    st:'done', isEnglishLecture:true},
+        {name:'운동손상관리',                 cr:3, area:'전공 선택',    st:'done', isEnglishLecture:true},
+        {name:'건강증진론',                   cr:3, area:'전공 선택',    st:'done'},
+      ]},
+      {id:'ce-3-1', label:'3학년 1학기 (2026-1)', pill:'warn', pillText:'18학점 수강예정', open:true, courses:[
+        {name:'불교와정신분석학',              cr:3, area:'교양 배분이수', st:'todo'},
+        {name:'공학수학2',                    cr:3, area:'기타',     st:'todo'},
+        {name:'기초프로그래밍',               cr:3, area:'기타',     st:'todo'},
+        {name:'운동손상',                     cr:3, area:'전공 필수',    st:'todo'},
+        {name:'운동손상평가',                 cr:3, area:'전공 선택',    st:'todo', isEnglishLecture:true},
+        {name:'임상역학',                     cr:3, area:'전공 선택',    st:'todo'},
+      ]},
+    ],
+  },
+
+  '문희원': {
+    major:'디지털콘텐츠학과', year:'23학번', totalRequired:120,
+    progress:65, totalDone:78, totalCurrent:0, remainSem:3, academicStatus:'휴학',
+    alert:'지금 휴학 중이에요. 졸업인증은 면제받았으니 복학하면 전공 기초랑 영어강의에 집중하면 돼요!',
+    reqs:[
+      {name:'전공 기초',    cls:'rb-warn', text:'15/18학점 · 3학점 부족'},
+      {name:'전공 선택',    cls:'rb-ng',   text:'30/55학점 · 25학점 부족'},
+      {name:'교양 필수교과', cls:'rb-warn', text:'15/17학점 · 2학점 부족'},
+      {name:'교양 배분이수', cls:'rb-ok',   text:'12/12학점 충족'},
+      {name:'교양 자유이수', cls:'rb-ok',   text:'4/3학점 충족'},
+      {name:'영어강의',       cls:'rb-warn', text:'2/3학점 이수'},
+      {name:'SW 기초교육',    cls:'rb-ok',   text:'6/6학점 충족'},
+      {name:'외국어인증',     cls:'rb-ok',   text:'통과 (면제)'},
+      {name:'전산인증',       cls:'rb-ok',   text:'통과 (면제)'},
+      {name:'한국어능력인증', cls:'rb-ok',   text:'통과 (면제)'},
+      {name:'졸업능력인증',   cls:'rb-ng',   text:'불합격 (휴학중)'},
+    ],
+    treeReqs:[
+      {name:'전공 기초', cls:'rb-warn', items:[
+        {dot:'rd-ok',  name:'기이수 전공기초',   cr:'15학점'},
+        {dot:'rd-warn',name:'잔여 전공기초',     cr:'3학점 부족'},
+      ]},
+      {name:'전공 선택', cls:'rb-ng', items:[
+        {dot:'rd-ok',  name:'기이수 전공선택',   cr:'30학점'},
+        {dot:'rd-ng',  name:'잔여 전공선택',     cr:'25학점 부족'},
+      ]},
+      {name:'교양 필수교과', cls:'rb-warn', items:[
+        {dot:'rd-ok',  name:'기이수 교양필수',   cr:'15학점'},
+        {dot:'rd-warn',name:'잔여 교양필수',     cr:'2학점 부족'},
+      ]},
+      {name:'졸업인증', cls:'rb-ok', items:[
+        {dot:'rd-warn',name:'영어강의',          cr:'2/3학점'},
+        {dot:'rd-ok',  name:'외국어인증',        cr:'면제'},
+        {dot:'rd-ok',  name:'전산인증',          cr:'면제'},
+      ]},
+    ],
+    semesters:[
+      {id:'mh-1-1', label:'1학년 1학기 (2023-1)', pill:'ok', pillText:'18학점 이수완료', open:false, courses:[
+        {name:'세계와시민',                          cr:3, area:'교양 필수교과', st:'done'},
+        {name:'성찰과표현',                          cr:3, area:'교양 필수교과', st:'done'},
+        {name:'아시아공동체론',                      cr:3, area:'교양 배분이수', st:'done'},
+        {name:'컴퓨터게임개론:이론과기술(s)',            cr:3, area:'교양 자유이수', st:'done'},
+        {name:'평면디자인',                          cr:3, area:'전공 기초',    st:'done'},
+        {name:'입체디자인',                          cr:3, area:'전공 기초',    st:'done'},
+      ]},
+      {id:'mh-1-2', label:'1학년 2학기 (2023-2)', pill:'ok', pillText:'15학점 이수완료', open:false, courses:[
+        {name:'초급일본어',                          cr:3, area:'교양 배분이수', st:'done'},
+        {name:'생활속의공예:미와쓰임',               cr:3, area:'교양 배분이수', st:'done'},
+        {name:'전공탐색및기업과정신세미나',           cr:1, area:'교양 자유이수', st:'done'},
+        {name:'취창업스쿨(자아탐색을통한진로설정)',   cr:2, area:'기타',     st:'done'},
+        {name:'드로잉',                              cr:3, area:'전공 기초',    st:'done'},
+        {name:'디지털디자인(s)',                      cr:3, area:'전공 기초',    st:'done'},
+      ]},
+      {id:'mh-2-1', label:'2학년 1학기 (2024-1)', pill:'ok', pillText:'18학점 이수완료', open:false, courses:[
+        {name:'인간의가치탐색',                      cr:3, area:'교양 필수교과', st:'done'},
+        {name:'주제연구',                            cr:3, area:'교양 필수교과', st:'done'},
+        {name:'3D모델링',                            cr:3, area:'전공 선택',    st:'done', isEnglishLecture:true},
+        {name:'비주얼디자인',                        cr:3, area:'전공 선택',    st:'done'},
+        {name:'애니메이션연구',                      cr:3, area:'전공 선택',    st:'done', isEnglishLecture:true},
+        {name:'3D모션그래픽스',                      cr:3, area:'전공 선택',    st:'done'},
+      ]},
+      {id:'mh-2-2', label:'2학년 2학기 (2024-2)', pill:'ok', pillText:'12학점 이수완료', open:false, courses:[
+        {name:'빅뱅에서문명까지',                    cr:3, area:'교양 필수교과', st:'done'},
+        {name:'현대미술사',                          cr:3, area:'전공 기초',    st:'done'},
+        {name:'디지털영상',                          cr:3, area:'전공 선택',    st:'done'},
+        {name:'뉴미디어표현기법',                    cr:3, area:'전공 선택',    st:'done'},
+      ]},
+      {id:'mh-3-1', label:'3학년 1학기 (2025-1)', pill:'ok', pillText:'15학점 이수완료', open:true, courses:[
+        {name:'디아스포라',                          cr:3, area:'교양 배분이수', st:'done'},
+        {name:'모션그래픽스',                        cr:3, area:'전공 선택',    st:'done'},
+        {name:'VFX제작',                             cr:3, area:'전공 선택',    st:'done'},
+        {name:'가상현실디자인',                      cr:3, area:'전공 선택',    st:'done'},
+        {name:'콘텐츠디자인기초',                    cr:3, area:'전공 선택',    st:'done'},
+      ]},
+    ],
+  },
+};
+
+// ══════════════════════════════════════
+// 상태
+// ══════════════════════════════════════
+let selectedName = '';
+let pdfUploaded = false;
+let currentData = null;
+let sidebarOpen = true;
+let extraCourses = [];
+let _editMode = false;
+let _editTarget = null; // {type:'extra'|'sem', ei?:number, semId?:string, ci?:number}
+let _prevTab = 'requirements';
+let _dragSrc           = null; // {semId, ci}
+let _dragOverCi        = null; // 동일 학기 드래그 삽입 위치
+let _plannerOpenStates = {};   // 플래너 토글 열림 상태
+let _reqOpenStates     = {};   // 졸업요건 아코디언 열림 상태
+let _reqDBData         = []; // req view 드래그용 인덱스
+let _dynReqs           = []; // req view 드래그용 요건 이름 참조
+let _reqAccOrder       = {}; // 아코디언 내 카드 표시 순서 {accIdx:[gIdx...]}
+let _reqDragSrcAccIdx  = -1; // 드래그 출발 아코디언 인덱스
+let _reqDragOverGIdx   = null;
+let _masterDBData = []; // 렌더 시점의 전체 과목 메타 배열
+
+// ══════════════════════════════════════
+// localStorage 자동저장 / 복원
+// ══════════════════════════════════════
+const LS_PFX = 'gp_';
+
+function saveState() {
+  if (!selectedName || !currentData) return;
+  try {
+    const payload = {
+      semesters: JSON.parse(JSON.stringify(currentData.semesters)),
+      extra:     JSON.parse(JSON.stringify(extraCourses)),
+    };
+    localStorage.setItem(LS_PFX + selectedName, JSON.stringify(payload));
+    // 저장됨 표시
+    const ind = document.getElementById('saveIndicator');
+    if (ind) { ind.textContent = '저장됨 ✓'; ind.style.opacity = '1'; setTimeout(() => ind.style.opacity = '0', 2000); }
+  } catch(e) { console.warn('저장 실패:', e); }
+}
+
+function loadStateForStudent(name) {
+  try {
+    const raw = localStorage.getItem(LS_PFX + name);
+    if (!raw) return [];
+    const payload = JSON.parse(raw);
+    if (payload.semesters && DB[name]) {
+      // DB 학기를 기준으로 저장된 과목 수정사항만 덮어씀 (새 학기가 사라지지 않도록)
+      const savedMap = new Map(payload.semesters.map(s => [s.id, s]));
+      DB[name].semesters = DB[name].semesters.map(s =>
+        savedMap.has(s.id) ? savedMap.get(s.id) : s
+      );
+      // 사용자가 직접 추가한 학기(DB에 없는 것)도 보존
+      const dbIds = new Set(DB[name].semesters.map(s => s.id));
+      payload.semesters.filter(s => !dbIds.has(s.id)).forEach(s => DB[name].semesters.push(s));
+    }
+    return payload.extra || [];
+  } catch(e) { return []; }
+}
+
+function manualSave() {
+  saveState();
+  toast('변경사항이 저장됐어요 ✓');
+}
+
+function resetData() {
+  if (!selectedName) return;
+  if (!confirm(`"${selectedName}"의 저장된 데이터를 초기화할까요?\n직접 추가·수정한 내용이 모두 사라져요.`)) return;
+  localStorage.removeItem(LS_PFX + selectedName);
+  location.reload();
+}
+
+// ══════════════════════════════════════
+// 온보딩
+// ══════════════════════════════════════
+function onNameInput(val) {
+  selectedName = val.trim();
+  checkBtn();
+}
+
+function onFieldChange() { checkBtn(); }
+
+function onPdfSelect(input) {
+  const file = input.files && input.files[0];
+  const name = file ? file.name : '졸업사정관리표.pdf';
+  document.getElementById('pdfDefault').style.display = 'none';
+  document.getElementById('pdfDone').style.display = 'block';
+  document.getElementById('pdfName').textContent = name;
+  document.getElementById('pdfUpload').classList.add('uploaded');
+  pdfUploaded = true;
+  checkBtn();
+}
+
+// 드래그앤드롭
+const pu = document.getElementById('pdfUpload');
+pu.addEventListener('dragover', e => { e.preventDefault(); pu.classList.add('uploaded'); });
+pu.addEventListener('dragleave', () => { if (!pdfUploaded) pu.classList.remove('uploaded'); });
+pu.addEventListener('drop', e => {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if (file && file.type === 'application/pdf') {
+    document.getElementById('pdfDefault').style.display = 'none';
+    document.getElementById('pdfDone').style.display = 'block';
+    document.getElementById('pdfName').textContent = file.name;
+    pu.classList.add('uploaded');
+    pdfUploaded = true;
+    checkBtn();
+  }
+});
+
+function checkBtn() {
+  const major = document.getElementById('selMajor').value;
+  const year  = document.getElementById('selYear').value;
+  const btn   = document.getElementById('obBtn');
+  const ready = major && year && selectedName && pdfUploaded;
+  btn.className = 'ob-btn' + (ready ? ' enabled' : '');
+}
+
+// ══════════════════════════════════════
+// 화면 전환 — display inline style 단일 방식
+// ══════════════════════════════════════
+function showScreen(id) {
+  document.getElementById('s1').style.display = 'none';
+  document.getElementById('s2').style.display = 'none';
+  document.getElementById('s3').style.display = 'none';
+  document.getElementById(id).style.display = 'flex';
+}
+
+function goBack() { localStorage.removeItem('gp_lastUser'); showScreen('s1'); }
+
+// ══════════════════════════════════════
+// 로딩 → 대시보드
+// ══════════════════════════════════════
+function startAnalysis() {
+  const major = document.getElementById('selMajor').value;
+  const year  = document.getElementById('selYear').value;
+  if (!major || !year || !selectedName || !pdfUploaded) return;
+
+  const majorMap = {theater:'연극영화학과',mech:'기계공학과',fashion:'의상디자인학과',design:'산업디자인학과',astro:'천문학과',digital:'디지털콘텐츠학과',food:'식품생명공학과',chemical:'화학공학과',sports:'스포츠의학과'};
+  document.getElementById('tbBc').textContent = majorMap[major] || major;
+  document.getElementById('sbMajor').textContent = (majorMap[major]||major) + ' · ' + year + '학번';
+
+  localStorage.setItem('gp_lastUser', selectedName);
+  showScreen('s2');
+
+  const steps = ['ls1','ls2','ls3','ls4'];
+  const msgs  = ['졸업사정관리표 파싱 중...','이수 과목 분류 중...','졸업요건 대조 중...','로드맵 생성 중...'];
+  let i = 0;
+
+  function tick() {
+    if (i > 0) {
+      document.getElementById(steps[i-1]).classList.remove('active');
+      document.getElementById(steps[i-1]).classList.add('done');
+      document.getElementById('li'+(i)).textContent = '✓';
+    }
+    if (i < steps.length) {
+      document.getElementById(steps[i]).classList.add('active');
+      document.getElementById('loadTitle').textContent = msgs[i];
+      i++;
+      setTimeout(tick, 900);
+    } else {
+      setTimeout(() => {
+        showScreen('s3');       // 화면 전환 먼저
+        renderDashboard();      // 렌더링은 전환 후
+      }, 400);
+    }
+  }
+  tick();
+}
+
+// ══════════════════════════════════════
+// 동적 졸업요건 계산 (st==='done' 과목만 집계, 유연 매칭)
+// ══════════════════════════════════════
+function buildDynReqs(d) {
+  const allCourses = [...d.semesters.flatMap(s => s.courses), ...extraCourses];
+  const done     = allCourses.filter(c => c.st === 'done' || c.st === 'current');
+  const parseDen = t => { const m = t.match(/\/(\d+)학점/); return m ? +m[1] : null; };
+
+  // 배분이수 세부영역 키워드 (구·신 교육과정 병용)
+  const DIST_KEYS = [
+    '배분이수', '생명과우주', '생명·우주', '분석·추론', '분석추론',
+    '상징과문화', '상징·문화', '사회와평화', '사회·공동체',
+    '예술창작토대', '예술창작', '지능·정보', '지능정보',
+    '인간행동의이해',
+  ];
+
+  // 유연 area 매처: 완전 일치 대신 포함(includes) 기반 판정
+  const isMajBase = c => c.area.includes('전공') && c.area.includes('기초');
+  const isMajReq  = c => c.area.includes('전공') && c.area.includes('필수') && !c.area.includes('교양');
+  const isMajSel  = c => c.area.includes('전공') && c.area.includes('선택') && !c.area.includes('교양');
+  const isLibMand = c => c.area.includes('필수교과') ||
+                         (c.area.includes('교양') && c.area.includes('필수') &&
+                          !c.area.includes('배분') && !c.area.includes('자유'));
+  const isDist    = c => DIST_KEYS.some(k => c.area.includes(k));
+  const isFree    = c => c.area.includes('자유이수');
+  const isSw      = c => c.name.includes('(s)');
+
+  const sumBy = fn => done.filter(fn).reduce((s, c) => s + c.cr, 0);
+  const cntBy = fn => done.filter(fn).length;
+
+  return d.reqs.map(r => {
+    const n = r.name;
+    let earned, den, newCls, newText;
+
+
+
+    if (n.includes('배분이수')) {
+      earned         = sumBy(isDist);
+      const zones    = cntBy(isDist);
+      den            = parseDen(r.text) || 9;          // 학생 reqs text에서 분모 파싱
+      const zonesReq = Math.round(den / 3);            // 12학점→4영역, 9학점→3영역
+      const ok       = earned >= den && zones >= zonesReq;
+      newCls  = ok ? 'rb-ok' : earned > 0 ? 'rb-warn' : 'rb-ng';
+      newText = ok
+        ? `${earned}/${den}학점 충족`
+        : `${earned}/${den}학점 · ${zones}/${zonesReq}개 영역 이수`;
+
+    } else if (n.includes('영어강의')) {
+      const cnt = done.filter(c => c.name.includes('(e)') && c.area.includes('전공')).length;
+      const req = 3;
+      newCls  = cnt >= req ? 'rb-ok' : cnt > 0 ? 'rb-warn' : 'rb-ng';
+      newText = cnt >= req ? `${cnt}/${req}과목 충족` : `${cnt}/${req}과목 이수`;
+
+    } else {
+      const fn =
+        n.includes('전공') && n.includes('기초') ? isMajBase :
+        n.includes('전공') && n.includes('필수') ? isMajReq  :
+        n.includes('전공') && n.includes('선택') ? isMajSel  :
+        n.includes('필수교과')                    ? isLibMand :
+        n.includes('자유이수')                    ? isFree    :
+        n.includes('SW')                          ? isSw      : null;
+
+      if (fn !== null) {
+        earned = sumBy(fn);
+        den    = parseDen(r.text);
+        if (den !== null) {
+          newCls  = earned >= den ? 'rb-ok' : earned > 0 ? 'rb-warn' : 'rb-ng';
+          newText = earned >= den
+            ? `${earned}/${den}학점 충족`
+            : `${earned}/${den}학점 · ${den - earned}학점 부족`;
+        } else {
+          newCls = r.cls; newText = r.text;
+        }
+      } else {
+        newCls = r.cls; newText = r.text;
+      }
+    }
+
+    return { name: r.name, cls: newCls, text: newText };
+  });
+}
+
+// ══════════════════════════════════════
+// 대시보드 렌더링
+// ══════════════════════════════════════
+function renderDashboard() {
+  _prevSimPlanOkSet = new Set(); // 학생 전환 시 toast 상태 초기화
+  // 저장된 수정사항 복원 후 currentData 초기화
+  const savedExtra = loadStateForStudent(selectedName);
+  currentData = DB[selectedName];
+  if (!currentData) { currentData = DB['김수영']; } // fallback
+  extraCourses = savedExtra;
+
+  const d = currentData;
+
+  // 사이드바 — pct 동적 계산 (done 과목 기준, 졸업필수과목 단독 제외)
+  const _allForPct = [...d.semesters.flatMap(s => s.courses), ...extraCourses]
+    .filter(c => c.area.trim() !== '졸업필수과목');
+  const _dynDone = _allForPct.filter(c => c.st === 'done').reduce((s, c) => s + c.cr, 0);
+  const pct = Math.min(Math.round((_dynDone / (d.totalRequired || 120)) * 100), 100);
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('progBar').style.width = pct + '%';
+  const remPct = Math.round((1 - pct/100)*100);
+  document.getElementById('progRem').textContent = ((d.totalRequired||120) - _dynDone) + '학점';
+  document.getElementById('statReq').textContent = d.totalRequired || 120;
+  document.getElementById('progRemBar').style.width = remPct + '%';
+  const _n = selectedName;
+  let _pwStatus, _pwDesc;
+  if (d.academicStatus === '휴학') {
+    _pwStatus = `휴학 중인 감자 ${_n}`;
+    _pwDesc   = '복학하면 같이 달려봐요! 🌱';
+  } else if (d.remainSem <= 1) {
+    _pwStatus = `졸업 임박 감자 ${_n}`;
+    _pwDesc   = '마지막 학기예요, 조금만 더! 🎓';
+  } else {
+    // 현재 수강 중인 학기 레이블에서 학년 직접 읽기 → 엇학기/휴복학 케이스 대응
+    const _curSem  = d.semesters.find(s => s.courses.some(c => c.st === 'current'));
+    const _refSem  = _curSem ?? [...d.semesters].reverse().find(s => /\d학년/.test(s.label));
+    const _gradeM  = _refSem?.label.match(/(\d)학년/);
+    const _grade   = _gradeM ? +_gradeM[1] : (pct >= 75 ? 4 : pct >= 50 ? 3 : pct >= 25 ? 2 : 1);
+    if (_grade >= 4) {
+      _pwStatus = `4학년 감자 ${_n}`;
+      _pwDesc   = '졸업이 눈앞이에요, 파이팅!';
+    } else if (_grade === 3) {
+      _pwStatus = `3학년 감자 ${_n}`;
+      _pwDesc   = '절반 넘었어요! 쭉쭉 나가봐요!';
+    } else if (_grade === 2) {
+      _pwStatus = `2학년 감자 ${_n}`;
+      _pwDesc   = '아직 갈 길 많지만 할 수 있어요!';
+    } else {
+      _pwStatus = `신입 감자 ${_n}`;
+      _pwDesc   = '앞으로 쭉 함께해요! 🌱';
+    }
+  }
+  document.getElementById('pwStatus').textContent = _pwStatus;
+  document.getElementById('pwDesc').textContent   = _pwDesc;
+
+  // 동적 요건 계산 (이후 배지·패널 공통 사용)
+  const dynReqs = buildDynReqs(d);
+
+  // 배지
+  const ngCount = dynReqs.filter(r => r.cls === 'rb-ng').length;
+  const warnCount = dynReqs.filter(r => r.cls === 'rb-warn').length;
+  document.getElementById('badgeCnt').textContent = ngCount + warnCount;
+
+  // 패널 우측 (동적 계산값 사용)
+  document.getElementById('statSem').textContent = d.remainSem;
+
+  // 패널·학점 현황 모두 동적 계산으로 초기화
+  refreshPanel();
+
+  // 플래너 & 졸업요건 & 시뮬레이터
+  renderPlanner();
+  renderReqView();
+  renderSimBar();
+  switchTab('requirements'); // 기본 탭: 졸업요건
+}
+
+function calcSemPill(sem) {
+  const doneCr    = sem.courses.filter(c=>c.st==='done').reduce((s,c)=>s+c.cr,0);
+  const currentCr = sem.courses.filter(c=>c.st==='current').reduce((s,c)=>s+c.cr,0);
+  const todoCr    = sem.courses.filter(c=>c.st==='todo').reduce((s,c)=>s+c.cr,0);
+  const planCr    = currentCr + todoCr;
+  if (sem.pill==='session') return {cls:'session', text:`${doneCr+planCr}학점 · 계절학기`, block:'session'};
+  if (doneCr===0 && planCr===0) return {cls:'', text:'과목 없음', block:''};
+  if (planCr===0) return {cls:'ok', text:`${doneCr}학점 이수완료`, block:''};
+  const parts = [];
+  if (doneCr    > 0) parts.push(`${doneCr}학점 이수완료`);
+  if (currentCr > 0) parts.push(`${currentCr}학점 수강중`);
+  if (todoCr    > 0) parts.push(`${todoCr}학점 수강예정`);
+  return {cls:'warn', text: parts.join(' · '), block:'warn'};
+}
+
+function renderPlanner(forceOpen = {}) {
+  const d = currentData;
+  // 매 렌더 전 DOM에서 현재 열림 상태를 전부 스냅샷
+  d.semesters.forEach(sem => {
+    const body = document.getElementById('body-' + sem.id);
+    if (body) _plannerOpenStates[sem.id] = body.classList.contains('open');
+  });
+  ['extra','goal'].forEach(id => {
+    const body = document.getElementById('body-' + id);
+    if (body) _plannerOpenStates[id] = body.classList.contains('open');
+  });
+  // 명시적 오버라이드 적용 (드래그 후 목적 학기 강제 오픈 등)
+  Object.assign(_plannerOpenStates, forceOpen);
+
+  const openStates = {};
+  d.semesters.forEach(sem => {
+    openStates[sem.id] = _plannerOpenStates.hasOwnProperty(sem.id) ? _plannerOpenStates[sem.id] : !!sem.open;
+  });
+  ['extra','goal'].forEach(id => {
+    openStates[id] = _plannerOpenStates.hasOwnProperty(id) ? _plannerOpenStates[id] : true;
+  });
+
+  let html = `<div class="alert-box"><span class="alert-icon">💬</span><div>${d.alert}</div></div>`;
+  d.semesters.forEach(sem => {
+    const pill   = calcSemPill(sem);
+    const isOpen = openStates[sem.id];
+    html += `
+    <div class="sem-block ${pill.block}" id="block-${sem.id}">
+      <div class="sem-hd" onclick="toggleSem('${sem.id}')">
+        <div class="sem-toggle"><svg class="s-arrow ${isOpen?'open':''}" id="arr-${sem.id}" width="10" height="10" viewBox="0 0 10 10"><path d="M3 1.5L7 5L3 8.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="sem-meta">
+          <span class="sem-name">${sem.label}</span>
+          <button onclick="renameSemester('${sem.id}');event.stopPropagation()" title="학기명 수정"
+            style="border:none;background:none;cursor:pointer;font-size:11px;color:var(--tx4);padding:0 3px;flex-shrink:0;transition:color .12s;line-height:1"
+            onmouseover="this.style.color='var(--brand)'" onmouseout="this.style.color='var(--tx4)'">✏️</button>
+          <span class="sem-pill ${pill.cls}" id="pill-${sem.id}">${pill.text}</span>
+        </div>
+        ${sem.id.startsWith('sem-') ? `<button onclick="deleteSemester('${sem.id}');event.stopPropagation()" title="학기 삭제"
+          style="border:none;background:none;cursor:pointer;font-size:14px;color:var(--tx4);padding:0 8px;flex-shrink:0;transition:color .12s"
+          onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--tx4)'">🗑</button>` : ''}
+        <div class="sem-lbl">${isOpen?'접기':'펼치기'}</div>
+      </div>
+      <div class="sem-body ${isOpen?'open':''}" id="body-${sem.id}">
+        <div class="sem-courses" id="courses-${sem.id}"
+          ondragover="onSemDragOver(event,'${sem.id}')"
+          ondragleave="onSemDragLeave(event,'${sem.id}')"
+          ondrop="onSemDrop(event,'${sem.id}')">
+          ${sem.courses.map((c,ci)=>`
+          <div class="cc cc-${c.st}" style="position:relative" draggable="true"
+            data-ci="${ci}"
+            ondragstart="onCardDragStart(event,'${sem.id}',${ci})"
+            ondragend="onCardDragEnd(event)"
+            ondragover="onPlanCardDragOver(event,'${sem.id}',${ci})"
+            ondrop="onPlanCardDrop(event,'${sem.id}',${ci})">
+            <button onclick="openSemCourseEdit('${sem.id}',${ci})" title="수정"
+              style="position:absolute;top:7px;right:7px;border:none;background:var(--surface2);border-radius:5px;
+                     width:22px;height:22px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;
+                     color:var(--tx3);transition:background .12s" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='var(--surface2)'">✏️</button>
+            <button onclick="deleteSemCourse('${sem.id}',${ci})" title="삭제"
+              style="position:absolute;top:7px;right:32px;border:none;background:var(--surface2);border-radius:5px;
+                     width:22px;height:22px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;
+                     color:var(--red);transition:background .12s" onmouseover="this.style.background='var(--red-bg)'" onmouseout="this.style.background='var(--surface2)'">×</button>
+            <div class="cc-name" style="padding-right:58px">${c.name}</div>
+            <div class="cc-meta">${c.cr}학점 · ${displayArea(c.area)}</div>
+            <span class="cc-badge cob-${c.st}">${c.st==='done'?'이수완료':c.st==='current'?'수강중':c.st==='ng'?'미이수':'수강예정'}</span>
+          </div>`).join('')}
+          <button class="cc-add" onclick="openModal('${sem.id}')">＋ 과목 추가</button>
+        </div>
+      </div>
+    </div>`;
+  });
+  // 학기 추가 버튼
+  html += `
+  <button onclick="addSemester()"
+    style="width:100%;background:var(--surface);border:1.5px dashed var(--border2);border-radius:var(--rl);
+           padding:14px;font-family:inherit;font-size:13px;font-weight:600;color:var(--tx4);cursor:pointer;
+           margin-bottom:10px;transition:border-color .15s,color .15s;display:block"
+    onmouseover="this.style.borderColor='var(--brand)';this.style.color='var(--brand)'"
+    onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--tx4)'">
+    ＋ 학기 추가
+  </button>`;
+  // 졸업 목표
+  html += `
+  <div class="sem-block goal">
+    <div class="sem-hd" onclick="toggleSem('goal')">
+      <div class="sem-toggle"><svg class="s-arrow open" id="arr-goal" width="10" height="10" viewBox="0 0 10 10"><path d="M3 1.5L7 5L3 8.5" stroke="#16a34a" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="sem-meta"><span class="sem-name goal-label">🎓 졸업 목표</span><span class="sem-pill goal">${d.remainSem <= 1 ? '4학년 2학기' : '졸업까지 ' + d.remainSem + '학기'}</span></div>
+      <div class="sem-lbl" style="color:var(--green)">접기</div>
+    </div>
+    <div class="sem-body open" id="body-goal">
+      <div class="goal-body">
+        <svg width="52" height="58" viewBox="0 0 100 120" style="flex-shrink:0">
+          <defs><radialGradient id="gp" cx="35%" cy="24%" r="65%"><stop offset="0%" stop-color="#f8e080"/><stop offset="48%" stop-color="#d8ac3a"/><stop offset="100%" stop-color="#9a6c18"/></radialGradient><radialGradient id="gc" cx="38%" cy="28%" r="68%"><stop offset="0%" stop-color="#505e7a"/><stop offset="100%" stop-color="#1a2535"/></radialGradient><radialGradient id="gb" cx="40%" cy="22%" r="72%"><stop offset="0%" stop-color="#3d5070"/><stop offset="100%" stop-color="#1a2c42"/></radialGradient></defs>
+          <line x1="76" y1="2" x2="83" y2="0" stroke="#f0c000" stroke-width="2.2" stroke-linecap="round" opacity="0.9"/>
+          <line x1="80" y1="10" x2="90" y2="9" stroke="#f0c000" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+          <rect x="22" y="26" width="56" height="21" rx="3" fill="url(#gc)"/>
+          <polygon points="4,26 50,8 96,26 50,44" fill="url(#gb)"/>
+          <polygon points="4,26 50,8 96,26 50,44" fill="none" stroke="#0a1520" stroke-width="1.4"/>
+          <rect x="62" y="26" width="4" height="22" rx="1.5" fill="#f0c000"/>
+          <circle cx="64" cy="50" r="5" fill="#e0a800"/>
+          <ellipse cx="50" cy="85" rx="30" ry="32" fill="url(#gp)"/>
+          <path d="M35 77 Q40 71 45 77" fill="none" stroke="#2a1800" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M55 78 Q60 72 65 78" fill="none" stroke="#2a1800" stroke-width="2.2" stroke-linecap="round"/>
+          <ellipse cx="30" cy="87" rx="8" ry="5" fill="#e07040" opacity="0.25"/>
+          <ellipse cx="70" cy="88" rx="7" ry="4.5" fill="#e07040" opacity="0.25"/>
+          <path d="M36 96 Q50 107 64 96" fill="#e86050" stroke="#c04030" stroke-width="0.8"/>
+          <ellipse cx="22" cy="76" rx="7" ry="5" fill="#c89030" transform="rotate(-30 22 76)"/>
+          <ellipse cx="78" cy="76" rx="7" ry="5" fill="#c89030" transform="rotate(30 78 76)"/>
+          <line x1="16" y1="70" x2="11" y2="60" stroke="#9a6c18" stroke-width="3.2" stroke-linecap="round"/>
+          <line x1="16" y1="70" x2="21" y2="61" stroke="#9a6c18" stroke-width="3.2" stroke-linecap="round"/>
+          <line x1="84" y1="70" x2="79" y2="61" stroke="#9a6c18" stroke-width="3.2" stroke-linecap="round"/>
+          <line x1="84" y1="70" x2="89" y2="60" stroke="#9a6c18" stroke-width="3.2" stroke-linecap="round"/>
+          <ellipse cx="38" cy="116" rx="8" ry="5.5" fill="#b07820" transform="rotate(8 38 116)"/>
+          <ellipse cx="62" cy="117" rx="8" ry="5.5" fill="#b07820" transform="rotate(-8 62 117)"/>
+        </svg>
+        <div><div class="gt-title">어? 나 졸업하네? (멍)</div><div class="gt-sub">살다 보니 졸업도 하게 되더라고요.</div></div>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('plannerContent').innerHTML = html;
+}
+
+const _DIST_KEYS = ['배분이수','생명과우주','생명·우주','분석·추론','상징과문화','상징·문화','사회와평화','사회·공동체','예술창작토대','예술창작','지능·정보','인간행동의이해'];
+function matcherFor(n) {
+  if (n.includes('배분이수'))                   return c => _DIST_KEYS.some(k => c.area.includes(k));
+  if (n.includes('전공') && n.includes('기초')) return c => c.area.includes('전공') && c.area.includes('기초');
+  if (n.includes('전공') && n.includes('필수')) return c => c.area.includes('전공') && c.area.includes('필수') && !c.area.includes('교양');
+  if (n.includes('전공') && n.includes('선택')) return c => c.area.includes('전공') && c.area.includes('선택') && !c.area.includes('교양');
+  if (n.includes('필수교과'))                   return c => c.area.includes('필수교과') || (c.area.includes('교양') && c.area.includes('필수') && !c.area.includes('배분') && !c.area.includes('자유'));
+  if (n.includes('자유이수'))                   return c => c.area.includes('자유이수');
+  if (n.includes('SW'))                         return c => c.name.includes('(s)');
+  if (n.includes('영어강의'))                   return c => c.name.includes('(e)') && c.area.includes('전공');
+  if (n.includes('졸업능력인증'))               return c => c.name.includes('캡스톤') || c.area.includes('졸업필수과목');
+  return null;
+}
+function isMatchedByAnyReq(c, reqs) {
+  return reqs.some(r => { const fn = matcherFor(r.name); return fn && fn(c); });
+}
+
+function renderReqView() {
+  const d = currentData;
+  // 렌더 전 DOM에서 아코디언 열림 상태 스냅샷
+  let _si = 0;
+  while (document.getElementById('racc-body-' + _si)) {
+    _reqOpenStates[_si] = document.getElementById('racc-body-' + _si).style.display !== 'none';
+    _si++;
+  }
+  // 드래그앤드롭용 인덱스 빌드
+  const semC   = d.semesters.flatMap(s => s.courses.map((c,ci) => ({...c, _type:'sem', _semId:s.id, _ci:ci})));
+  const extC   = extraCourses.map((c,ei) => ({...c, _type:'extra', _ei:ei}));
+  _reqDBData   = [...semC, ...extC].map((c,i) => ({...c, _gIdx:i}));
+  const allCourses = _reqDBData;
+
+  const dynReqs = buildDynReqs(d);
+  _dynReqs = [...dynReqs, {name:'기타', cls:'', text:''}];
+
+  let html = dynReqs.map((r, idx) => {
+    const fn = matcherFor(r.name);
+    let relCourses = fn ? allCourses.filter(fn) : [];
+    if (_reqAccOrder[idx] && _reqAccOrder[idx].length) {
+      const om = new Map(_reqAccOrder[idx].map((g,i) => [g,i]));
+      relCourses = [...relCourses].sort((a,b) =>
+        (om.has(a._gIdx) ? om.get(a._gIdx) : Infinity) -
+        (om.has(b._gIdx) ? om.get(b._gIdx) : Infinity));
+    }
+    _reqAccOrder[idx] = relCourses.map(c => c._gIdx);
+    const isEnglish  = r.name.includes('영어강의');
+    const doneCrReq  = relCourses.filter(c=>c.st==='done').reduce((s,c)=>s+c.cr,0);
+    const curCrReq   = relCourses.filter(c=>c.st==='current').reduce((s,c)=>s+c.cr,0);
+    const earnedCr   = doneCrReq + curCrReq;
+    const doneVal    = isEnglish ? relCourses.filter(c=>c.st==='done').length    : doneCrReq;
+    const curVal     = isEnglish ? relCourses.filter(c=>c.st==='current').length : curCrReq;
+    const earnedVal  = doneVal + curVal;
+    const planCnt    = relCourses.filter(c=>c.st==='todo').length;
+    const planCr     = relCourses.filter(c=>c.st==='todo').reduce((s,c)=>s+c.cr,0);
+    const planVal    = isEnglish ? planCnt : planCr;
+    const pmReq     = isEnglish ? r.text.match(/\/(\d+)과목/) : r.text.match(/\/(\d+)학점/);
+    const pReq      = pmReq ? +pmReq[1] : 0;
+    const unit      = isEnglish ? '과목' : '학점';
+    const dynText   = pReq > 0
+      ? (earnedVal >= pReq ? `${earnedVal}/${pReq}${unit} 충족` : `${earnedVal}/${pReq}${unit} · ${pReq-earnedVal}${unit} 부족`)
+      : r.text;
+    const cls       = pReq > 0
+      ? (earnedVal >= pReq ? 'b-ok' : earnedVal > 0 ? 'b-warn' : 'b-ng')
+      : (r.cls==='rb-ok'?'b-ok':r.cls==='rb-warn'?'b-warn':'b-ng');
+    const accentClr = cls==='b-ok'?'var(--green)':cls==='b-warn'?'var(--amber)':'var(--red)';
+    const planBadge = planVal > 0
+      ? `<span style="color:var(--tx4);font-size:10px;margin-left:4px">(+${planVal}${unit} 예정)</span>` : '';
+
+    // 프로그레스 바 (3단: 초록/노란/회색)
+    const pDonePct   = pReq > 0 ? Math.min((doneVal / pReq) * 100, 100) : 0;
+    const pCurPct    = pReq > 0 ? Math.min((curVal  / pReq) * 100, Math.max(0, 100 - pDonePct)) : 0;
+    const pRemainPct = pReq > 0 ? Math.max(0, 100 - pDonePct - pCurPct) : 0;
+    const progBar    = pReq > 0 ? `
+      <div style="height:3px;background:var(--border);border-radius:2px;margin-top:7px;overflow:hidden;display:flex">
+        <div style="width:${pDonePct.toFixed(1)}%;height:100%;background:var(--green);border-radius:2px 0 0 2px;transition:width .3s"></div>
+        <div style="width:${pCurPct.toFixed(1)}%;height:100%;background:var(--amber);transition:width .3s"></div>
+        <div style="width:${pRemainPct.toFixed(1)}%;height:100%;background:var(--border2);transition:width .3s"></div>
+      </div>` : '';
+
+    // 아코디언 본문: 카드 그리드
+    const cards = relCourses.map(c => {
+      const sc = c.st==='done'?'cob-done':c.st==='todo'?'cob-todo':c.st==='ng'?'cob-ng':'cob-current';
+      const sl = c.st==='done'?'이수완료':c.st==='todo'?'수강예정':c.st==='ng'?'미이수':'수강중';
+      const semLabel = c._type==='extra' ? '추가 입력' : (d.semesters.find(s=>s.id===c._semId)?.label || '-');
+      return `<div class="cc cc-${c.st}" style="position:relative" draggable="true"
+        data-accidx="${idx}" data-gidx="${c._gIdx}"
+        ondragstart="onReqCardDragStart(event,${c._gIdx})"
+        ondragend="onReqCardDragEnd(event)"
+        ondragover="onReqCardDragOverSame(event,${idx},${c._gIdx})"
+        ondrop="onReqCardDropSame(event,${idx},${c._gIdx})">
+        <button onclick="openReqCardEdit(${c._gIdx})" title="수정"
+          style="position:absolute;top:7px;right:7px;border:none;background:var(--surface2);border-radius:5px;
+                 width:22px;height:22px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;
+                 color:var(--tx3);transition:background .12s" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='var(--surface2)'">✏️</button>
+        <button onclick="deleteReqCard(${c._gIdx})" title="삭제"
+          style="position:absolute;top:7px;right:32px;border:none;background:var(--surface2);border-radius:5px;
+                 width:22px;height:22px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;
+                 color:var(--red);transition:background .12s" onmouseover="this.style.background='var(--red-bg)'" onmouseout="this.style.background='var(--surface2)'">×</button>
+        <div class="cc-name" style="padding-right:58px">${c.name}</div>
+        <div class="cc-meta">${c.cr}학점 · ${semLabel}</div>
+        <span class="cc-badge ${sc}" style="margin-top:auto">${sl}</span>
+      </div>`;
+    }).join('') || `<div style="color:var(--tx4);font-size:11px;padding:4px 0">해당 과목 없음</div>`;
+
+    const _accOpen = _reqOpenStates.hasOwnProperty(idx) ? _reqOpenStates[idx] : (idx === 0);
+    const accordionHtml = `<div class="req-card" style="margin-bottom:8px;overflow:hidden">
+      <div style="padding:12px 16px;cursor:pointer" onclick="toggleReqAcc(${idx})">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span id="racc-arr-${idx}" style="font-size:9px;color:var(--tx4);display:inline-block;transition:transform .18s;flex-shrink:0;transform:${_accOpen?'rotate(90deg)':''}">▶</span>
+          <span style="font-size:13px;font-weight:700;color:var(--tx1)">${r.name}</span>
+          <span class="badge ${cls}" style="margin-left:auto">${dynText}${planBadge}</span>
+        </div>
+        ${progBar}
+      </div>
+      <div id="racc-body-${idx}" style="display:${_accOpen?'block':'none'};border-top:1px solid var(--border);padding:8px 12px">
+        <div id="req-grid-${idx}" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px"
+          ondragover="onReqAccDragOver(event,${idx})"
+          ondragleave="onReqAccDragLeave(event,${idx})"
+          ondrop="onReqAccDrop(event,${idx})">${cards}</div>
+        <button class="cc-add" style="width:100%;margin-top:8px" onclick="openReqCardAdd('${r.name}')">＋ 과목 추가</button>
+      </div>
+    </div>`;
+
+    if (r.name.includes('자유이수')) {
+      const etcC = allCourses.filter(c => !isMatchedByAnyReq(c, dynReqs));
+      if (etcC.length > 0) {
+        const eIdx  = dynReqs.length;
+        const eDone = etcC.filter(c => c.st==='done'||c.st==='current').reduce((s,c)=>s+c.cr,0);
+        const ePlan = etcC.filter(c => c.st==='todo').reduce((s,c)=>s+c.cr,0);
+        const eTotal = eDone + ePlan;
+        const ePB   = (eDone > 0 && ePlan > 0)
+          ? `<span style="color:var(--tx4);font-size:10px;margin-left:4px">(이수 ${eDone} · 예정 ${ePlan})</span>`
+          : ePlan > 0 ? `<span style="color:var(--blue);font-size:10px;margin-left:4px">(수강예정)</span>` : '';
+        if (_reqAccOrder[eIdx] && _reqAccOrder[eIdx].length) {
+          const om = new Map(_reqAccOrder[eIdx].map((g,i) => [g,i]));
+          etcC.sort((a,b) => (om.has(a._gIdx)?om.get(a._gIdx):Infinity) - (om.has(b._gIdx)?om.get(b._gIdx):Infinity));
+        }
+        _reqAccOrder[eIdx] = etcC.map(c => c._gIdx);
+        const eCards = etcC.map(c => {
+          const sc = c.st==='done'?'cob-done':c.st==='todo'?'cob-todo':c.st==='ng'?'cob-ng':'cob-current';
+          const sl = c.st==='done'?'이수완료':c.st==='todo'?'수강예정':c.st==='ng'?'미이수':'수강중';
+          const semLbl = c._type==='extra' ? '추가 입력' : (d.semesters.find(s=>s.id===c._semId)?.label || '-');
+          return `<div class="cc cc-${c.st}" style="position:relative" draggable="true"
+            data-accidx="${eIdx}" data-gidx="${c._gIdx}"
+            ondragstart="onReqCardDragStart(event,${c._gIdx})"
+            ondragend="onReqCardDragEnd(event)"
+            ondragover="onReqCardDragOverSame(event,${eIdx},${c._gIdx})"
+            ondrop="onReqCardDropSame(event,${eIdx},${c._gIdx})">
+            <button onclick="openReqCardEdit(${c._gIdx})" title="수정"
+              style="position:absolute;top:7px;right:7px;border:none;background:var(--surface2);border-radius:5px;
+                     width:22px;height:22px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;
+                     color:var(--tx3);transition:background .12s" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='var(--surface2)'">✏️</button>
+            <button onclick="deleteReqCard(${c._gIdx})" title="삭제"
+              style="position:absolute;top:7px;right:32px;border:none;background:var(--surface2);border-radius:5px;
+                     width:22px;height:22px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;
+                     color:var(--red);transition:background .12s" onmouseover="this.style.background='var(--red-bg)'" onmouseout="this.style.background='var(--surface2)'">×</button>
+            <div class="cc-name" style="padding-right:58px">${c.name}</div>
+            <div class="cc-meta">${c.cr}학점 · ${semLbl}</div>
+            <span class="cc-badge ${sc}" style="margin-top:auto">${sl}</span>
+          </div>`;
+        }).join('');
+        return accordionHtml + `<div class="req-card" style="margin-bottom:8px;overflow:hidden">
+          <div style="padding:12px 16px;cursor:pointer" onclick="toggleReqAcc(${eIdx})">
+            <div style="display:flex;align-items:center;gap:6px">
+              <span id="racc-arr-${eIdx}" style="font-size:9px;color:var(--tx4);display:inline-block;transition:transform .18s;flex-shrink:0;transform:${_reqOpenStates[eIdx]?'rotate(90deg)':''}">▶</span>
+              <span style="font-size:13px;font-weight:700;color:var(--tx1)">기타</span>
+              <span class="badge b-blue" style="margin-left:auto">${eTotal}학점 합산${ePB}</span>
+            </div>
+          </div>
+          <div id="racc-body-${eIdx}" style="display:${_reqOpenStates[eIdx]?'block':'none'};border-top:1px solid var(--border);padding:8px 12px">
+            <div style="color:var(--tx4);font-size:11px;margin-bottom:8px">졸업 총 이수학점에는 합산되나 특정 영역 요건에는 포함되지 않는 과목입니다.</div>
+            <div id="req-grid-${eIdx}" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px"
+              ondragover="onReqAccDragOver(event,${eIdx})"
+              ondragleave="onReqAccDragLeave(event,${eIdx})"
+              ondrop="onReqAccDrop(event,${eIdx})">${eCards}</div>
+            <button class="cc-add" style="width:100%;margin-top:8px" onclick="openReqCardAdd('기타')">＋ 과목 추가</button>
+          </div>
+        </div>`;
+      }
+    }
+    return accordionHtml;
+  }).join('');
+
+  document.getElementById('reqContent').innerHTML = html;
+}
+
+// ══════════════════════════════════════
+// 마스터 DB 뷰 (전체 이수과목 SSOT)
+// ══════════════════════════════════════
+function renderMasterDB() {
+  const d = currentData;
+  const el = document.getElementById('masterdbContent');
+  if (!d || !el) return;
+
+  // ── 마스터 DB (SSOT): 학기 과목 + 사용자 추가 과목 ──
+  const semCourses  = d.semesters.flatMap(s => s.courses.map((c, ci) => ({...c, _sem:s.label, _type:'sem', _semId:s.id, _ci:ci})));
+  const extraTagged = extraCourses.map((c, ei) => ({...c, _sem:'➕ 추가 입력', _type:'extra', _ei:ei}));
+  _masterDBData = [...semCourses, ...extraTagged].map((c, i) => ({...c, _gIdx:i}));
+
+  // 요약 통계
+  const doneCr  = _masterDBData.filter(c => c.st==='done').reduce((s,c)=>s+c.cr,0);
+  const planCr  = _masterDBData.filter(c => c.st==='todo').reduce((s,c)=>s+c.cr,0);
+  const doneCnt = _masterDBData.filter(c => c.st==='done').length;
+  const planCnt = _masterDBData.filter(c => c.st==='todo').length;
+
+  // 영역별 필터 정의 (buildDynReqs와 동일 매처)
+  const AREA_FILTERS = [
+    {val:'all',     label:'전체'},
+    {val:'major-b', label:'전공 기초',    fn: c => c.area.includes('전공') && c.area.includes('기초')},
+    {val:'major-r', label:'전공 필수',    fn: c => c.area.includes('전공') && c.area.includes('필수') && !c.area.includes('교양')},
+    {val:'major-s', label:'전공 선택',    fn: c => c.area.includes('전공') && c.area.includes('선택') && !c.area.includes('교양')},
+    {val:'lib-m',   label:'교양 필수교과', fn: c => c.area.includes('필수교과') || (c.area.includes('교양') && c.area.includes('필수') && !c.area.includes('배분') && !c.area.includes('자유'))},
+    {val:'lib-d',   label:'교양 배분이수', fn: c => c.area.includes('배분이수')},
+    {val:'lib-f',   label:'교양 자유이수', fn: c => c.area.includes('자유이수')},
+    {val:'etc',     label:'기타',         fn: c => c.area.includes('기타')},
+  ];
+
+  // 필터 상태 읽기 (없으면 'all')
+  const activeFilter = el.dataset.filter || 'all';
+  const activeDef = AREA_FILTERS.find(f => f.val === activeFilter) || AREA_FILTERS[0];
+  const filtered  = activeDef.fn ? _masterDBData.filter(activeDef.fn) : _masterDBData;
+
+  const filterBtn = ({val, label}) => {
+    const on = activeFilter === val;
+    return `<button onclick="setMasterDBFilter('${val}')"
+      style="padding:4px 11px;border-radius:20px;border:1.5px solid ${on?'var(--brand)':'var(--border2)'};
+             background:${on?'var(--brand-l)':'var(--surface)'};color:${on?'var(--brand)':'var(--tx3)'};
+             font-size:11px;font-weight:${on?700:500};cursor:pointer;font-family:inherit;white-space:nowrap">${label}</button>`;
+  };
+
+  const cards = filtered.map(c => {
+    const scls = c.st==='done'?'cob-done':c.st==='todo'?'cob-todo':c.st==='ng'?'cob-ng':'cob-current';
+    const slbl = c.st==='done'?'이수완료':c.st==='todo'?'수강예정':c.st==='ng'?'미이수':'수강중';
+    return `<div class="cc cc-${c.st}" style="position:relative">
+      <button onclick="openEditModal(${c._gIdx})" title="수정"
+        style="position:absolute;top:7px;right:7px;border:none;background:var(--surface2);border-radius:5px;
+               width:22px;height:22px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;
+               color:var(--tx3);transition:background .12s" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='var(--surface2)'">✏️</button>
+      <div class="cc-name" style="padding-right:26px">${c.name}</div>
+      <div class="cc-meta">${c.cr}학점 · ${c.area}</div>
+      <div style="font-size:10px;color:var(--tx4);margin-top:2px">${c._sem||''}</div>
+      <span class="cc-badge ${scls}" style="margin-top:auto">${slbl}</span>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:12px 16px;margin-bottom:8px;box-shadow:var(--sh)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+        <span style="font-size:14px;font-weight:700;color:var(--tx1)">전체 ${_masterDBData.length}과목</span>
+        <span class="badge b-ok">완료 ${doneCnt}과목 · ${doneCr}학점</span>
+        <span class="badge b-blue">예정 ${planCnt}과목 · ${planCr}학점</span>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${AREA_FILTERS.map(filterBtn).join('')}
+      </div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;box-shadow:var(--sh)">
+      <div style="padding:10px 12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:8px">
+        ${cards || '<div style="color:var(--tx4);font-size:12px;padding:16px 4px">해당 과목이 없습니다</div>'}
+        <button class="cc-add" onclick="openModal()">＋ 과목 추가</button>
+      </div>
+    </div>`;
+}
+
+// 우측 패널 졸업요건 현황만 빠르게 재계산
+function refreshPanel() {
+  const d = currentData;
+  if (!d) return;
+
+  // ── 마스터 DB 기준 학점 동적 계산 ──
+  const allCourses = [...d.semesters.flatMap(s => s.courses), ...extraCourses];
+  const notGradOnly = c => c.area.trim() !== '졸업필수과목';
+  const doneCr    = allCourses.filter(c => c.st === 'done'    && notGradOnly(c)).reduce((s, c) => s + c.cr, 0);
+  const currentCr = allCourses.filter(c => c.st === 'current' && notGradOnly(c)).reduce((s, c) => s + c.cr, 0);
+  const totalReq  = d.totalRequired || 120;
+  const remainCr  = Math.max(0, totalReq - doneCr - currentCr);
+
+  // 학점 현황 카드 갱신
+  document.getElementById('statDone').innerHTML = currentCr > 0
+    ? `${doneCr}<span style="font-size:11px;font-weight:500;color:var(--amber);margin-left:1px">(${currentCr})</span>`
+    : `${doneCr}`;
+  document.getElementById('statExp').textContent  = remainCr;
+  document.getElementById('statReq').textContent  = totalReq;
+
+  // 졸업요건 현황 + 사이드바 배지
+  const dynReqs = buildDynReqs(d);
+  const ngCnt   = dynReqs.filter(r => r.cls === 'rb-ng').length;
+  const warnCnt = dynReqs.filter(r => r.cls === 'rb-warn').length;
+  document.getElementById('badgeCnt').textContent = ngCnt + warnCnt;
+  document.getElementById('panelReqs').innerHTML  = dynReqs.map(r => `
+    <div class="p-row">
+      <span class="p-rname">${r.name}</span>
+      <span class="badge ${r.cls==='rb-ok'?'b-ok':r.cls==='rb-warn'?'b-warn':'b-ng'}">${r.text}</span>
+    </div>`).join('');
+}
+
+function setMasterDBFilter(val) {
+  const el = document.getElementById('masterdbContent');
+  if (el) el.dataset.filter = val;
+  renderMasterDB();
+}
+
+function toggleReqAcc(idx) {
+  const body = document.getElementById('racc-body-' + idx);
+  const arr  = document.getElementById('racc-arr-'  + idx);
+  if (!body) return;
+  const open = body.style.display === 'none';
+  body.style.display = open ? 'block' : 'none';
+  if (arr) arr.style.transform = open ? 'rotate(90deg)' : '';
+  _reqOpenStates[idx] = open;
+}
+
+
+// ══════════════════════════════════════
+// UI 이벤트
+// ══════════════════════════════════════
+function toggleSB() {
+  sidebarOpen = !sidebarOpen;
+  document.getElementById('sidebar').classList.toggle('collapsed', !sidebarOpen);
+}
+
+function addSemester() {
+  const label = prompt('추가할 학기명을 입력하세요\n예: 4학년 2학기 (2026-2)');
+  if (!label || !label.trim()) return;
+  currentData.semesters.push({
+    id: 'sem-' + Date.now(),
+    label: label.trim(),
+    pill: 'ok',
+    pillText: '0학점',
+    open: true,
+    courses: []
+  });
+  saveState();
+  renderPlanner();
+  renderSimBar();
+  toast('"' + label.trim() + '" 학기가 추가됐어요.');
+}
+
+function collapseAll() {
+  const activeTab = document.querySelector('.tab.active')?.id?.replace('tab-', '');
+  if (activeTab === 'requirements') {
+    let i = 0;
+    while (document.getElementById('racc-body-' + i)) {
+      const body = document.getElementById('racc-body-' + i);
+      const arr  = document.getElementById('racc-arr-'  + i);
+      if (body) body.style.display = 'none';
+      if (arr)  arr.style.transform = '';
+      _reqOpenStates[i] = false;
+      i++;
+    }
+  } else if (activeTab === 'planner') {
+    const ids = [...(currentData?.semesters||[]).map(s => s.id), 'goal'];
+    ids.forEach(id => {
+      const body = document.getElementById('body-' + id);
+      const arr  = document.getElementById('arr-'  + id);
+      if (!body) return;
+      body.classList.remove('open');
+      if (arr) arr.classList.remove('open');
+      const lbl = body.previousElementSibling?.querySelector('.sem-lbl');
+      if (lbl) lbl.textContent = '펼치기';
+      _plannerOpenStates[id] = false;
+    });
+  }
+}
+
+function renameSemester(semId) {
+  const sem = currentData?.semesters.find(s => s.id === semId);
+  if (!sem) return;
+  const newLabel = prompt('학기명을 수정하세요\n예: 3학년 2학기 (2026-1)', sem.label);
+  if (!newLabel || !newLabel.trim() || newLabel.trim() === sem.label) return;
+  sem.label = newLabel.trim();
+  saveState();
+  renderPlanner();
+  renderReqView();
+  toast('"' + sem.label + '"으로 수정됐어요.');
+}
+
+function deleteSemester(semId) {
+  const sem = currentData.semesters.find(s => s.id === semId);
+  if (!sem) return;
+  const hasCourses = sem.courses.length > 0;
+  const msg = hasCourses
+    ? `"${sem.label}" 학기를 삭제할까요?\n포함된 과목 ${sem.courses.length}개도 함께 삭제됩니다.`
+    : `"${sem.label}" 학기를 삭제할까요?`;
+  if (!confirm(msg)) return;
+  currentData.semesters = currentData.semesters.filter(s => s.id !== semId);
+  saveState();
+  refreshPanel();
+  renderPlanner();
+  renderReqView();
+  renderSimBar();
+  toast(`"${sem.label}" 학기가 삭제됐어요.`);
+}
+
+function toggleSem(id) {
+  const body = document.getElementById('body-'+id);
+  const arr  = document.getElementById('arr-'+id);
+  if (!body || !arr) return;
+  const open = body.classList.toggle('open');
+  arr.classList.toggle('open', open);
+  const lbl = body.previousElementSibling.querySelector('.sem-lbl');
+  if (lbl) lbl.textContent = open ? '접기' : '펼치기';
+  _plannerOpenStates[id] = open;
+}
+
+function reqAreaFor(n) {
+  if (!n) return null;
+  if (n === '기타')                             return '기타';
+  if (n.includes('배분이수'))                   return '교양 배분이수';
+  if (n.includes('전공') && n.includes('기초')) return '전공 기초';
+  if (n.includes('전공') && n.includes('필수')) return '전공 필수';
+  if (n.includes('전공') && n.includes('선택')) return '전공 선택';
+  if (n.includes('필수교과'))                   return '교양 필수교과';
+  if (n.includes('자유이수'))                   return '교양 자유이수';
+  if (n.includes('졸업능력인증'))               return '졸업필수과목';
+  return null; // SW·영어강의 등은 드롭 불가
+}
+
+function onReqCardDragStart(e, gIdx) {
+  if (e.target.closest('button')) { e.preventDefault(); return; }
+  const card = e.target.closest('.cc');
+  _reqDragSrc = _reqDBData[gIdx];
+  _reqDragSrcAccIdx = card ? +(card.getAttribute('data-accidx') ?? -1) : -1;
+  e.dataTransfer.effectAllowed = 'move';
+  setTimeout(() => { if(card) card.style.opacity='0.35'; }, 0);
+}
+function onReqCardDragEnd(e) {
+  const el = e.target.closest('.cc');
+  if (el) el.style.opacity = '';
+  document.querySelectorAll('[id^="req-grid-"]').forEach(el => el.classList.remove('drop-target'));
+  document.querySelectorAll('.cc.drag-insert').forEach(el => el.classList.remove('drag-insert'));
+  _reqDragSrc = null; _reqDragSrcAccIdx = -1; _reqDragOverGIdx = null;
+}
+function onReqAccDragOver(e, idx) {
+  if (!_reqDragSrc) return;
+  if (reqAreaFor(_dynReqs[idx]?.name) === null) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  const el = document.getElementById('req-grid-' + idx);
+  if (el) el.classList.add('drop-target');
+}
+function onReqAccDragLeave(e, idx) {
+  const el = document.getElementById('req-grid-' + idx);
+  if (el && !el.contains(e.relatedTarget)) el.classList.remove('drop-target');
+}
+function onReqAccDrop(e, idx) {
+  e.preventDefault();
+  const el = document.getElementById('req-grid-' + idx);
+  if (el) el.classList.remove('drop-target');
+  if (!_reqDragSrc) return;
+  const newArea = reqAreaFor(_dynReqs[idx]?.name);
+  if (!newArea) { _reqDragSrc = null; return; }
+  let course;
+  if (_reqDragSrc._type === 'extra') {
+    course = extraCourses[_reqDragSrc._ei];
+  } else {
+    const sem = currentData.semesters.find(s => s.id === _reqDragSrc._semId);
+    if (sem) course = sem.courses[_reqDragSrc._ci];
+  }
+  if (!course || course.area === newArea) { _reqDragSrc = null; return; }
+  const oldArea = course.area;
+  course.area = newArea;
+  _reqDragSrc = null;
+  saveState();
+  refreshPanel();
+  renderPlanner();
+  renderReqView();
+  renderSimBar();
+  toast(`"${course.name}" → ${newArea}`);
+}
+let _reqDragSrc = null;
+
+function onCardDragStart(e, semId, ci) {
+  if (e.target.closest('button')) { e.preventDefault(); return; }
+  _dragSrc = {semId, ci};
+  e.dataTransfer.effectAllowed = 'move';
+  setTimeout(() => { const el = e.target.closest('.cc'); if(el) el.style.opacity='0.35'; }, 0);
+}
+
+function onCardDragEnd(e) {
+  const el = e.target.closest('.cc');
+  if (el) el.style.opacity = '';
+  document.querySelectorAll('.sem-courses').forEach(el => el.classList.remove('drop-target'));
+  document.querySelectorAll('.cc.drag-insert').forEach(el => el.classList.remove('drag-insert'));
+  _dragSrc = null;
+}
+
+function onCardDragOverCard(e, semId, ci) {
+  if (!_dragSrc) return;
+  if (_dragSrc.semId === semId && _dragSrc.ci === ci) return;
+  e.preventDefault();
+  e.stopPropagation();
+  document.querySelectorAll('.cc.drag-insert').forEach(el => el.classList.remove('drag-insert'));
+  const el = e.target.closest('.cc');
+  if (el) el.classList.add('drag-insert');
+}
+
+function onCardDragLeaveCard(e) {
+  const el = e.target.closest('.cc');
+  if (el && !el.contains(e.relatedTarget)) el.classList.remove('drag-insert');
+}
+
+function onCardDropOnCard(e, targetSemId, targetCi) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.querySelectorAll('.cc.drag-insert').forEach(el => el.classList.remove('drag-insert'));
+  document.querySelectorAll('.sem-courses').forEach(el => el.classList.remove('drop-target'));
+  if (!_dragSrc) return;
+  if (_dragSrc.semId === targetSemId && _dragSrc.ci === targetCi) { _dragSrc = null; return; }
+
+  if (_dragSrc.semId === targetSemId) {
+    // 같은 학기 내 순서 변경
+    const sem = currentData.semesters.find(s => s.id === targetSemId);
+    if (!sem) { _dragSrc = null; return; }
+    const [course] = sem.courses.splice(_dragSrc.ci, 1);
+    const insertAt = targetCi > _dragSrc.ci ? targetCi - 1 : targetCi;
+    sem.courses.splice(insertAt, 0, course);
+    _dragSrc = null;
+    saveState();
+    renderPlanner();
+  } else {
+    // 다른 학기로 이동 — targetCi 위치에 삽입
+    const srcSem = currentData.semesters.find(s => s.id === _dragSrc.semId);
+    const dstSem = currentData.semesters.find(s => s.id === targetSemId);
+    if (!srcSem || !dstSem) { _dragSrc = null; return; }
+    const [course] = srcSem.courses.splice(_dragSrc.ci, 1);
+    dstSem.courses.splice(targetCi, 0, course);
+    _dragSrc = null;
+    saveState();
+    refreshPanel();
+    renderPlanner();
+    renderReqView();
+    renderSimBar();
+    toast(`"${course.name}" → ${dstSem.label}으로 이동됐어요.`);
+  }
+}
+
+function onSemDragOver(e, semId) {
+  if (!_dragSrc) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  if (_dragSrc.semId !== semId) {
+    document.querySelectorAll('.cc.drag-insert').forEach(el => el.classList.remove('drag-insert'));
+    const container = document.getElementById('courses-'+semId);
+    if (container) container.classList.add('drop-target');
+  }
+}
+
+function onPlanCardDragOver(e, semId, ci) {
+  if (!_dragSrc || _dragSrc.semId !== semId || _dragSrc.ci === ci) return;
+  e.preventDefault();
+  e.stopPropagation();
+  document.querySelectorAll('.cc.drag-insert').forEach(el => el.classList.remove('drag-insert'));
+  const el = e.target.closest('.cc');
+  if (el) el.classList.add('drag-insert');
+  _dragOverCi = ci;
+}
+
+function onPlanCardDrop(e, semId, ci) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.querySelectorAll('.cc.drag-insert').forEach(el => el.classList.remove('drag-insert'));
+  document.querySelectorAll('.sem-courses').forEach(el => el.classList.remove('drop-target'));
+  if (!_dragSrc || _dragSrc.semId !== semId || _dragSrc.ci === ci) {
+    _dragSrc = null; _dragOverCi = null; return;
+  }
+  const sem = currentData.semesters.find(s => s.id === semId);
+  if (!sem) { _dragSrc = null; _dragOverCi = null; return; }
+  const [course] = sem.courses.splice(_dragSrc.ci, 1);
+  sem.courses.splice(ci > _dragSrc.ci ? ci - 1 : ci, 0, course);
+  _dragSrc = null; _dragOverCi = null;
+  saveState();
+  renderPlanner({[semId]: true});
+}
+
+function onReqCardDragOverSame(e, accIdx, gIdx) {
+  if (!_reqDragSrc || _reqDragSrcAccIdx !== accIdx || _reqDragSrc._gIdx === gIdx) return;
+  e.preventDefault();
+  e.stopPropagation();
+  document.querySelectorAll('.cc.drag-insert').forEach(el => el.classList.remove('drag-insert'));
+  const el = e.target.closest('.cc');
+  if (el) el.classList.add('drag-insert');
+  _reqDragOverGIdx = gIdx;
+}
+
+function onReqCardDropSame(e, accIdx, gIdx) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.querySelectorAll('.cc.drag-insert').forEach(el => el.classList.remove('drag-insert'));
+  document.querySelectorAll('[id^="req-grid-"]').forEach(el => el.classList.remove('drop-target'));
+  if (!_reqDragSrc || _reqDragSrcAccIdx !== accIdx || _reqDragSrc._gIdx === gIdx) {
+    _reqDragSrc = null; _reqDragSrcAccIdx = -1; _reqDragOverGIdx = null; return;
+  }
+  const order = _reqAccOrder[accIdx] ? [..._reqAccOrder[accIdx]] : [];
+  const fromIdx = order.indexOf(_reqDragSrc._gIdx);
+  const toIdx   = order.indexOf(gIdx);
+  if (fromIdx === -1 || toIdx === -1) { _reqDragSrc = null; _reqDragSrcAccIdx = -1; _reqDragOverGIdx = null; return; }
+  order.splice(fromIdx, 1);
+  order.splice(toIdx > fromIdx ? toIdx - 1 : toIdx, 0, _reqDragSrc._gIdx);
+  _reqAccOrder[accIdx] = order;
+  _reqDragSrc = null; _reqDragSrcAccIdx = -1; _reqDragOverGIdx = null;
+  renderReqView();
+}
+
+function onSemDragLeave(e, semId) {
+  const el = document.getElementById('courses-'+semId);
+  if (el && !el.contains(e.relatedTarget)) {
+    el.classList.remove('drop-target');
+    el.querySelectorAll('.cc.drag-insert').forEach(c => c.classList.remove('drag-insert'));
+    _dragOverCi = null;
+  }
+}
+
+function onSemDrop(e, targetSemId) {
+  e.preventDefault();
+  const container = document.getElementById('courses-'+targetSemId);
+  if (container) container.classList.remove('drop-target');
+  document.querySelectorAll('.cc.drag-insert').forEach(el => el.classList.remove('drag-insert'));
+  if (!_dragSrc) return;
+
+  if (_dragSrc.semId === targetSemId) {
+    // 빈 공간 드롭 → 맨 뒤로 이동 (카드 위 드롭은 onPlanCardDrop에서 처리)
+    const sem = currentData.semesters.find(s => s.id === targetSemId);
+    if (sem && _dragSrc.ci < sem.courses.length - 1) {
+      const [course] = sem.courses.splice(_dragSrc.ci, 1);
+      sem.courses.push(course);
+      _dragSrc = null; _dragOverCi = null;
+      saveState();
+      renderPlanner({[targetSemId]: true});
+    } else { _dragSrc = null; _dragOverCi = null; }
+    return;
+  }
+
+  const srcSemId = _dragSrc.semId;
+  const srcSem = currentData.semesters.find(s => s.id === srcSemId);
+  const dstSem = currentData.semesters.find(s => s.id === targetSemId);
+  if (!srcSem || !dstSem) { _dragSrc = null; _dragOverCi = null; return; }
+  const [course] = srcSem.courses.splice(_dragSrc.ci, 1);
+  dstSem.courses.push(course);
+  _dragSrc = null; _dragOverCi = null;
+  saveState();
+  refreshPanel();
+  renderPlanner({[targetSemId]: true});
+  renderReqView();
+  renderSimBar();
+  toast(`"${course.name}" → ${dstSem.label}으로 이동됐어요.`);
+}
+
+function openMasterDB() {
+  const activeTab = document.querySelector('.tab.active');
+  if (activeTab) _prevTab = activeTab.id.replace('tab-', '');
+  ['planner','requirements','masterdb'].forEach(v => {
+    document.getElementById('view-'+v).style.display = v==='masterdb' ? 'flex' : 'none';
+  });
+  renderMasterDB();
+}
+
+function closeMasterDB() {
+  switchTab(_prevTab);
+}
+
+function openReqCardEdit(gIdx) {
+  const c = _reqDBData[gIdx];
+  if (!c) return;
+  _editMode   = true;
+  _editTarget = {type: c._type, semId: c._semId, ci: c._ci, ei: c._ei};
+  document.getElementById('mName').value = c.name;
+  _setCrValue(c.cr);
+  document.getElementById('mArea').value = c.area || '전공 기초';
+  renderAreaChips();
+  document.getElementById('mSt').value = c.st;
+  const semSel = document.getElementById('mSem');
+  semSel.innerHTML = '<option value="extra">➕ 추가 입력 (학기 미지정)</option><option disabled>──────────────</option>' +
+    (currentData?.semesters||[]).map(s => `<option value="${s.id}">${s.label}</option>`).join('');
+  semSel.value = c._type === 'extra' ? 'extra' : (c._semId || 'extra');
+  document.getElementById('mSemRow').style.display = 'block';
+  document.getElementById('mDelBtn').style.display = 'inline-flex';
+  _setModalMode(true);
+  document.getElementById('modal').classList.add('show');
+  setTimeout(() => document.getElementById('mName').focus(), 80);
+}
+
+function deleteReqCard(gIdx) {
+  const c = _reqDBData[gIdx];
+  if (!c) return;
+  if (!confirm(`"${c.name}"을(를) 삭제할까요?`)) return;
+  if (c._type === 'extra') {
+    extraCourses.splice(c._ei, 1);
+  } else {
+    const sem = currentData?.semesters.find(s => s.id === c._semId);
+    if (sem) sem.courses.splice(c._ci, 1);
+  }
+  saveState();
+  refreshPanel();
+  renderPlanner();
+  renderReqView();
+  renderSimBar();
+  toast(`"${c.name}" 삭제됐어요.`);
+}
+
+function openReqCardAdd(reqName) {
+  const areaMap = {
+    '전공 기초':'전공 기초','전공 필수':'전공 필수','전공 선택':'전공 선택',
+    '교양 필수교과':'교양 필수교과','교양 배분이수':'교양 배분이수','교양 자유이수':'교양 자유이수',
+    'SW 기초교육':'교양 자유이수','영어강의':'전공 선택','졸업능력인증':'졸업필수과목','기타':'기타'
+  };
+  const area = Object.keys(areaMap).find(k => reqName.includes(k)) || '';
+  openModal();
+  // 영역 드롭다운 사전 선택
+  if (area) {
+    document.getElementById('mArea').value = areaMap[area] || '전공 기초';
+    renderAreaChips();
+  }
+}
+
+function deleteSemCourse(semId, ci) {
+  const sem = currentData?.semesters.find(s => s.id === semId);
+  if (!sem) return;
+  const name = sem.courses[ci]?.name || '과목';
+  if (!confirm(`"${name}"을(를) 삭제할까요?`)) return;
+  sem.courses.splice(ci, 1);
+  saveState();
+  refreshPanel();
+  renderPlanner();
+  renderReqView();
+  renderSimBar();
+  toast(`"${name}" 삭제됐어요.`);
+}
+
+function openSemCourseEdit(semId, ci) {
+  const sem = currentData?.semesters.find(s => s.id === semId);
+  if (!sem || sem.courses[ci] === undefined) return;
+  const c = sem.courses[ci];
+  _editMode   = true;
+  _editTarget = {type:'sem', semId, ci};
+  document.getElementById('mName').value = c.name;
+  _setCrValue(c.cr);
+  document.getElementById('mArea').value = c.area || '전공 기초';
+  renderAreaChips();
+  document.getElementById('mSt').value = c.st;
+  const semSel = document.getElementById('mSem');
+  semSel.innerHTML = '<option value="extra">➕ 추가 입력 (학기 미지정)</option><option disabled>──────────────</option>' +
+    (currentData?.semesters||[]).map(s => `<option value="${s.id}">${s.label}</option>`).join('');
+  semSel.value = semId;
+  document.getElementById('mSemRow').style.display = 'block';
+  document.getElementById('mDelBtn').style.display = 'inline-flex';
+  _setModalMode(true);
+  document.getElementById('modal').classList.add('show');
+  setTimeout(()=>document.getElementById('mName').focus(), 80);
+}
+
+function toggleReqCat(hd) {
+  hd.querySelector('.req-arrow').classList.toggle('open');
+  hd.nextElementSibling.classList.toggle('open');
+}
+
+let _panelOpen = false;
+
+function togglePanel() {
+  _panelOpen = !_panelOpen;
+  const panel = document.querySelector('.panel');
+  const btn   = document.getElementById('simToggleBtn');
+  panel.classList.toggle('collapsed', !_panelOpen);
+  if (btn) btn.textContent = _panelOpen ? '시뮬레이터 ◀' : '시뮬레이터 ▶';
+  if (_panelOpen) renderSimBar();
+}
+
+function setPanelOpen(open) {
+  _panelOpen = open;
+  const panel = document.querySelector('.panel');
+  const btn   = document.getElementById('simToggleBtn');
+  panel.classList.toggle('collapsed', !open);
+  if (btn) {
+    btn.textContent = open ? '시뮬레이터 ◀' : '시뮬레이터 ▶';
+    btn.style.display = 'inline-flex';
+  }
+  if (open) renderSimBar();
+}
+
+function switchTab(t) {
+  document.querySelectorAll('.tab').forEach(e => e.classList.remove('active'));
+  const tabEl = document.getElementById('tab-'+t);
+  if (tabEl) tabEl.classList.add('active');
+  ['planner','requirements','masterdb'].forEach(v => {
+    document.getElementById('view-'+v).style.display = v===t ? 'flex' : 'none';
+  });
+  if (t === 'masterdb') renderMasterDB();
+  else if (t === 'requirements') { renderReqView(); setPanelOpen(false); }
+  else if (t === 'planner')      { renderPlanner(); setPanelOpen(true);  }
+}
+
+const AREA_OPTIONS = ['전공 기초','전공 필수','전공 선택','교양 필수교과','교양 배분이수','교양 기초교과','교양 자유이수','졸업필수과목','기타'];
+
+function displayArea(area) {
+  return (area || '').split(',').map(s => s.trim()).join(' · ');
+}
+
+function renderAreaChips() {
+  const val = document.getElementById('mArea').value || '전공 기초';
+  const selected = new Set(val.split(',').map(s => s.trim()));
+  const el = document.getElementById('mAreaChips');
+  if (!el) return;
+  el.innerHTML = AREA_OPTIONS.map(a => {
+    const on = selected.has(a);
+    const isGrad = a === '졸업필수과목';
+    return `<button type="button" onclick="toggleAreaChip('${a}')"
+      style="padding:4px 11px;border-radius:20px;border:1.5px solid ${on?(isGrad?'var(--potato)':'var(--brand)'):'var(--border2)'};
+             background:${on?(isGrad?'var(--potato-l)':'var(--brand-l)'):'var(--surface)'};
+             color:${on?(isGrad?'var(--potato)':'var(--brand)'):'var(--tx3)'};
+             font-size:11px;font-weight:${on?700:400};cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .12s">${a}</button>`;
+  }).join('');
+}
+
+function toggleAreaChip(area) {
+  const input = document.getElementById('mArea');
+  const selected = new Set((input.value || '전공 기초').split(',').map(s => s.trim()));
+  if (area === '졸업필수과목') {
+    if (selected.has(area)) {
+      selected.delete(area);
+      if (selected.size === 0) selected.add(area);
+    } else {
+      selected.add(area);
+    }
+  } else {
+    const hasGrad = selected.has('졸업필수과목');
+    selected.clear();
+    selected.add(area);
+    if (hasGrad) selected.add('졸업필수과목');
+  }
+  input.value = [...selected].join(',');
+  renderAreaChips();
+}
+
+function _setModalMode(isEdit) {
+  document.querySelector('.modal-title').textContent  = isEdit ? '과목 수정' : '과목 추가';
+  document.querySelector('.modal-ft .btn-p').textContent = isEdit ? '수정하기' : '추가하기';
+}
+function openModal(targetSemId) {
+  _editMode   = false;
+  _editTarget = null;
+  _setModalMode(false);
+  const semSel = document.getElementById('mSem');
+  semSel.innerHTML = '<option value="extra">➕ 추가 입력 (학기 미지정)</option><option disabled>──────────────</option>' +
+    (currentData?.semesters||[]).map(s => `<option value="${s.id}">${s.label}</option>`).join('');
+  semSel.value = targetSemId || 'extra';
+  document.getElementById('mSemRow').style.display = 'block';
+  document.getElementById('mDelBtn').style.display = 'none';
+  document.getElementById('mArea').value = '전공 기초';
+  renderAreaChips();
+  document.getElementById('modal').classList.add('show');
+  setTimeout(()=>document.getElementById('mName').focus(), 80);
+}
+function onCrChange(sel) {
+  const custom = document.getElementById('mCrCustom');
+  custom.style.display = sel.value === 'custom' ? 'block' : 'none';
+  if (sel.value === 'custom') custom.focus();
+}
+function _setCrValue(cr) {
+  const sel = document.getElementById('mCr');
+  const custom = document.getElementById('mCrCustom');
+  if ([1, 2, 3].includes(+cr)) {
+    sel.value = cr;
+    custom.style.display = 'none';
+  } else {
+    sel.value = 'custom';
+    custom.style.display = 'block';
+    custom.value = cr;
+  }
+}
+function openEditModal(gIdx) {
+  const c = _masterDBData[gIdx];
+  if (!c) return;
+  _editMode   = true;
+  _editTarget = {type:c._type, semId:c._semId, ci:c._ci, ei:c._ei};
+  document.getElementById('mName').value = c.name;
+  _setCrValue(c.cr);
+  document.getElementById('mArea').value = c.area || '전공 기초';
+  renderAreaChips();
+  document.getElementById('mSt').value = c.st;
+  // 수강 학기 선택
+  const semSel = document.getElementById('mSem');
+  semSel.innerHTML = '<option value="extra">➕ 추가 입력 (학기 미지정)</option><option disabled>──────────────</option>' +
+    (currentData?.semesters||[]).map(s => `<option value="${s.id}">${s.label}</option>`).join('');
+  semSel.value = c._type === 'extra' ? 'extra' : (c._semId || 'extra');
+  document.getElementById('mSemRow').style.display = 'block';
+  document.getElementById('mDelBtn').style.display = 'inline-flex';
+  _setModalMode(true);
+  document.getElementById('modal').classList.add('show');
+  setTimeout(()=>document.getElementById('mName').focus(), 80);
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+  _editMode   = false;
+  _editTarget = null;
+  _setModalMode(false);
+  document.getElementById('mCr').value = '3';
+  document.getElementById('mCrCustom').style.display = 'none';
+  document.getElementById('mSemRow').style.display = 'none';
+  document.getElementById('mDelBtn').style.display = 'none';
+  document.getElementById('mArea').value = '전공 기초';
+  renderAreaChips();
+}
+document.getElementById('modal').addEventListener('click', e => { if (e.target===document.getElementById('modal')) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
+
+function deleteCourse() {
+  if (!_editMode || !_editTarget) return;
+  if (!confirm('이 과목을 삭제할까요?')) return;
+  if (_editTarget.type === 'extra') {
+    extraCourses.splice(_editTarget.ei, 1);
+  } else {
+    const sem = currentData?.semesters.find(s => s.id === _editTarget.semId);
+    if (sem) sem.courses.splice(_editTarget.ci, 1);
+  }
+  closeModal();
+  saveState();
+  refreshPanel();
+  renderPlanner();
+  renderReqView();
+  renderSimBar();
+  if (document.getElementById('tab-masterdb')?.classList.contains('active')) renderMasterDB();
+  toast('과목이 삭제됐어요.');
+}
+
+function addCourse() {
+  const name = document.getElementById('mName').value.trim();
+  if (!name) { document.getElementById('mName').style.borderColor='var(--red)'; return; }
+  const crSel = document.getElementById('mCr');
+  const cr = crSel.value === 'custom' ? +document.getElementById('mCrCustom').value : +crSel.value;
+  if (!cr || cr < 1) { document.getElementById('mCrCustom').style.borderColor='var(--red)'; return; }
+
+  // 유효성 통과 후 모달 값 먼저 캡처 → 즉시 닫기
+  const newData  = {name, cr, area:document.getElementById('mArea').value, st:document.getElementById('mSt').value};
+  const newSemId = document.getElementById('mSem').value;
+  const em = _editMode, et = _editTarget;
+  document.getElementById('mName').value = '';
+  document.getElementById('mName').style.borderColor = '';
+  closeModal();
+
+  if (em && et) {
+    // ── 편집 모드 ──
+    if (et.type === 'extra') {
+      if (newSemId === 'extra') {
+        if (extraCourses[et.ei]) Object.assign(extraCourses[et.ei], newData);
+      } else {
+        extraCourses.splice(et.ei, 1);
+        const sem = currentData?.semesters.find(s => s.id === newSemId);
+        if (sem) sem.courses.push(newData);
+      }
+    } else {
+      const oldSem = currentData?.semesters.find(s => s.id === et.semId);
+      if (newSemId === 'extra') {
+        if (oldSem) oldSem.courses.splice(et.ci, 1);
+        extraCourses.push(newData);
+      } else if (newSemId === et.semId) {
+        if (oldSem && oldSem.courses[et.ci]) Object.assign(oldSem.courses[et.ci], newData);
+      } else {
+        if (oldSem) oldSem.courses.splice(et.ci, 1);
+        const newSem = currentData?.semesters.find(s => s.id === newSemId);
+        if (newSem) newSem.courses.push(newData);
+      }
+    }
+    toast('"' + name + '" 수정됐어요.');
+  } else {
+    // ── 추가 모드 ──
+    const targetSem = newSemId !== 'extra' ? currentData?.semesters.find(s => s.id === newSemId) : null;
+    if (targetSem) { targetSem.courses.push(newData); }
+    else           { extraCourses.push(newData); }
+    toast('"' + name + '" 추가됐어요.');
+  }
+
+  saveState();
+  refreshPanel();       // 우측 패널 졸업요건 현황 즉시 갱신
+  renderPlanner();
+  renderReqView();
+  renderSimBar();
+  if (document.getElementById('tab-masterdb')?.classList.contains('active')) renderMasterDB();
+}
+
+// ══════════════════════════════════════
+// 플래닝 시뮬레이터 바
+// ══════════════════════════════════════
+let _prevSimPlanOkSet = new Set(); // 이전 렌더에서 이미 충족된 요건 추적 (toast 중복 방지)
+function renderSimBar() {
+  const d = currentData;
+  const el = document.getElementById('simBars');
+  if (!d || !el) return;
+
+  const allCourses = [...d.semesters.flatMap(s => s.courses), ...extraCourses];
+  const total      = d.totalRequired || 120;
+  const notGradOnly = c => c.area.trim() !== '졸업필수과목';
+  const doneCr    = allCourses.filter(c => c.st === 'done'    && notGradOnly(c)).reduce((s, c) => s + c.cr, 0);
+  const currentCr = allCourses.filter(c => c.st === 'current' && notGradOnly(c)).reduce((s, c) => s + c.cr, 0);
+  const planCr    = allCourses.filter(c => c.st === 'todo'    && notGradOnly(c)).reduce((s, c) => s + c.cr, 0);
+  const donePct    = Math.min((doneCr    / total) * 100, 100);
+  const currentPct = Math.min((currentCr / total) * 100, Math.max(0, 100 - donePct));
+  const remainPct  = Math.max(0, 100 - donePct - currentPct); // 잔여가 나머지 전체를 채움
+
+  // 요건별 미니 시뮬 — done-only 패스 (current 임시 제외, try-finally로 복원 보장)
+  const curCourses = allCourses.filter(c => c.st === 'current');
+  let dynDoneOnly;
+  curCourses.forEach(c => { c.st = '_cur'; });
+  try { dynDoneOnly = buildDynReqs(d); } finally { curCourses.forEach(c => { c.st = 'current'; }); }
+
+  const dynDone = buildDynReqs(d); // done + current
+
+  // todo → done 임시 처리로 충족 예측
+  const planCourses = allCourses.filter(c => c.st === 'todo');
+  planCourses.forEach(c => { c.st = 'done'; });
+  const dynWithPlan = buildDynReqs(d);
+  planCourses.forEach(c => { c.st = 'todo'; });
+
+  // 요건별 미니 바 (3단) — 전체 이수율은 맨 아래
+  let html = ``;
+  dynDone.forEach((r, i) => {
+    const rp = dynWithPlan[i];
+    const rd = dynDoneOnly[i];
+    if (!rp) return;
+    const wasOk = r.cls === 'rb-ok';
+    const nowOk = rp.cls === 'rb-ok';
+    const m = rp.text.match(/^(\d+)\/(\d+)(학점|과목)/);
+    if (!m) return;
+    const earn = +m[1], req = +m[2], unit = m[3];
+    const isEng       = unit === '과목';
+    const earDoneOnly = +(rd?.text.match(/^(\d+)/) || [0,0])[1];
+    const earCurrent  = Math.max(0, +(r.text.match(/^(\d+)/) || [0,0])[1] - earDoneOnly);
+    const planPortion = Math.max(0, earn - earDoneOnly - earCurrent);
+    const remainVal   = Math.max(0, req - earDoneOnly - earCurrent - planPortion);
+    const barDone    = Math.min((earDoneOnly              / req) * 100, 100);
+    const barCurrent = Math.min((earCurrent               / req) * 100, Math.max(0, 100 - barDone));
+    const barRemain  = Math.min((Math.max(0, planPortion) / req) * 100, Math.max(0, 100 - barDone - barCurrent)); // todo 과목만큼 표시 → 시뮬레이션 가시성
+    const checkMark  = nowOk && !wasOk ? ' 🎯' : nowOk ? ' ✓' : '';
+
+    // 영어강의(과목 단위)는 기존 포맷 유지, 나머지는 완료/수강중/잔여 포맷
+    const rightLabel = isEng
+      ? `<span style="color:var(--green)">${earDoneOnly}</span>${earCurrent>0?`<span style="color:var(--amber)">+${earCurrent}</span>`:''}${planPortion>0?`<span style="color:var(--tx4)">+${planPortion}</span>`:''}/${req}과목${checkMark}`
+      : `<span style="color:var(--green)">완료 ${earDoneOnly}</span> <span style="color:var(--tx4);font-weight:400">·</span> <span style="color:var(--amber)">수강중 ${earCurrent}</span> <span style="color:var(--tx4);font-weight:400">·</span> <span style="color:var(--tx3)">잔여 ${remainVal}</span> <span style="${remainVal===0 ? 'color:var(--tx1);font-weight:700' : 'color:var(--tx4);font-weight:400'}">/ ${req}학점</span>${checkMark}`;
+
+    html += `
+      <div class="sim-bar-wrap">
+        <div class="sim-bar-label" style="flex-direction:column;gap:2px;margin-bottom:5px">
+          <span style="color:var(--tx3);font-size:10px">${r.name}</span>
+          <span style="font-size:10px;font-weight:700">${rightLabel}</span>
+        </div>
+        <div class="sim-bar-track" style="height:6px">
+          <div class="sim-bar-done"    style="width:${barDone.toFixed(1)}%;border-radius:3px 0 0 3px"></div>
+          <div class="sim-bar-current" style="width:${barCurrent.toFixed(1)}%"></div>
+          <div class="sim-bar-plan"    style="width:${barRemain.toFixed(1)}%"></div>
+        </div>
+      </div>`;
+  });
+
+  // 기타 영역 미니 바 (충족요건 없음 — 합산 표시만)
+  const etcSim = allCourses.filter(c => !isMatchedByAnyReq(c, dynDone));
+  if (etcSim.length > 0) {
+    const etcDone = etcSim.filter(c=>c.st==='done').reduce((s,c)=>s+c.cr,0);
+    const etcCur  = etcSim.filter(c=>c.st==='current').reduce((s,c)=>s+c.cr,0);
+    const etcPlan = etcSim.filter(c=>c.st==='todo').reduce((s,c)=>s+c.cr,0);
+    const etcBD   = Math.min((etcDone / total) * 100, 100);
+    const etcBC   = Math.min((etcCur  / total) * 100, Math.max(0, 100 - etcBD));
+    const etcBP   = Math.min((etcPlan / total) * 100, Math.max(0, 100 - etcBD - etcBC));
+    const etcTotal = etcDone + etcCur + etcPlan;
+    html += `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;margin-bottom:4px">
+        <span style="color:var(--tx3);font-size:10px">기타</span>
+        <span style="font-size:10px;font-weight:700;color:var(--tx2)">${etcTotal}학점 합산${etcPlan > 0 ? `<span style="color:var(--tx4);font-weight:400"> (+${etcPlan} 예정)</span>` : ''}</span>
+      </div>`;
+  }
+
+  // 전체 이수율 — 맨 아래, 완료/수강중/잔여 포맷
+  const totalRemainder = Math.max(0, total - doneCr - currentCr - planCr);
+  html += `
+    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:10px">
+      <div class="sim-bar-label" style="margin-bottom:5px;align-items:center">
+        <span style="font-size:11px;font-weight:700;color:var(--tx2)">전체 이수율</span>
+        <span style="display:flex;gap:6px;align-items:center;font-size:10px;font-weight:700">
+          <span style="color:var(--green)">완료 ${doneCr}</span>
+          <span style="color:var(--tx4);font-weight:400">·</span>
+          <span style="color:var(--amber)">수강중 ${currentCr}</span>
+          <span style="color:var(--tx4);font-weight:400">·</span>
+          <span style="color:var(--tx3)">잔여 ${totalRemainder}</span>
+          <span style="color:var(--tx4);font-weight:400">/ ${total} 총 학점</span>
+        </span>
+      </div>
+      <div class="sim-bar-track">
+        <div class="sim-bar-done"    style="width:${donePct.toFixed(1)}%"></div>
+        <div class="sim-bar-current" style="width:${currentPct.toFixed(1)}%"></div>
+        <div class="sim-bar-plan"    style="width:${remainPct.toFixed(1)}%"></div>
+      </div>
+    </div>`;
+
+  el.innerHTML = html;
+
+  // 새로 충족되는 요건 toast — 이전 렌더 대비 새로 ok가 된 경우에만 발화
+  const nextOkSet = new Set();
+  dynDone.forEach((r, i) => {
+    const rp = dynWithPlan[i];
+    if (rp && rp.cls === 'rb-ok') nextOkSet.add(r.name);
+    if (rp && r.cls !== 'rb-ok' && rp.cls === 'rb-ok' && !_prevSimPlanOkSet.has(r.name)) {
+      toast(`🎉 ${r.name} 로드맵 완성!`);
+    }
+  });
+  _prevSimPlanOkSet = nextOkSet;
+}
+
+// 새로고침 후 자동 복원
+(function() {
+  const lastUser = localStorage.getItem('gp_lastUser');
+  if (!lastUser || !DB[lastUser]) return;
+  selectedName = lastUser;
+  pdfUploaded  = true;
+  const d = DB[lastUser];
+  document.getElementById('tbBc').textContent    = d.major;
+  document.getElementById('sbMajor').textContent = d.major + ' · ' + d.year;
+  showScreen('s3');
+  renderDashboard();
+})();
+
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// 플래닝 시뮬레이터 패널 드래그 리사이즈
+(function() {
+  const PANEL_MIN = 320;
+  const handle = document.getElementById('panelResizeHandle');
+  if (!handle) return;
+  handle.addEventListener('mousedown', e => {
+    const panel = document.querySelector('.panel');
+    if (!panel || panel.classList.contains('collapsed')) return;
+    const startX     = e.clientX;
+    const startWidth = panel.offsetWidth;
+    panel.style.transition = 'none';
+    handle.classList.add('dragging');
+    document.body.style.cursor    = 'col-resize';
+    document.body.style.userSelect = 'none';
+    const onMove = ev => {
+      const w = Math.max(PANEL_MIN, startWidth - (ev.clientX - startX));
+      panel.style.width = w + 'px';
+    };
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup',   onUp);
+      panel.style.transition     = '';
+      handle.classList.remove('dragging');
+      document.body.style.cursor     = '';
+      document.body.style.userSelect = '';
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup',   onUp);
+    e.preventDefault();
+  });
+})();
+</script>
+</body>
+</html>
