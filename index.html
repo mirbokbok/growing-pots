@@ -1071,20 +1071,11 @@ function saveState() {
 function loadStateForStudent(name) {
   try {
     const raw = localStorage.getItem(LS_PFX + name);
-    if (!raw) return [];
+    if (!raw) return { semesters: null, extra: [] };
     const payload = JSON.parse(raw);
-    if (payload.semesters && DB[name]) {
-      // DB 학기를 기준으로 저장된 과목 수정사항만 덮어씀 (새 학기가 사라지지 않도록)
-      const savedMap = new Map(payload.semesters.map(s => [s.id, s]));
-      DB[name].semesters = DB[name].semesters.map(s =>
-        savedMap.has(s.id) ? savedMap.get(s.id) : s
-      );
-      // 사용자가 직접 추가한 학기(DB에 없는 것)도 보존
-      const dbIds = new Set(DB[name].semesters.map(s => s.id));
-      payload.semesters.filter(s => !dbIds.has(s.id)).forEach(s => DB[name].semesters.push(s));
-    }
-    return payload.extra || [];
-  } catch(e) { return []; }
+    // DB 원본은 건드리지 않고 저장된 내용만 반환 — renderDashboard에서 복사본에 적용
+    return { semesters: payload.semesters || null, extra: payload.extra || [] };
+  } catch(e) { return { semesters: null, extra: [] }; }
 }
 
 function manualSave() {
@@ -1284,11 +1275,18 @@ function buildDynReqs(d) {
 // ══════════════════════════════════════
 function renderDashboard() {
   _prevSimPlanOkSet = new Set(); // 학생 전환 시 toast 상태 초기화
-  // 저장된 수정사항 복원 후 currentData 초기화
-  const savedExtra = loadStateForStudent(selectedName);
-  currentData = DB[selectedName];
-  if (!currentData) { currentData = DB['김수영']; } // fallback
-  extraCourses = savedExtra;
+  // DB 원본을 깊은 복사 후 저장된 수정사항을 복사본에만 적용 (DB 원본 보호)
+  const saved = loadStateForStudent(selectedName);
+  currentData = JSON.parse(JSON.stringify(DB[selectedName] || DB['김수영']));
+  if (saved.semesters) {
+    const savedMap = new Map(saved.semesters.map(s => [s.id, s]));
+    currentData.semesters = currentData.semesters.map(s =>
+      savedMap.has(s.id) ? savedMap.get(s.id) : s
+    );
+    const existIds = new Set(currentData.semesters.map(s => s.id));
+    saved.semesters.filter(s => !existIds.has(s.id)).forEach(s => currentData.semesters.push(s));
+  }
+  extraCourses = saved.extra;
 
   const d = currentData;
 
