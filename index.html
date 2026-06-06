@@ -97,9 +97,9 @@ body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--tx1);backg
 .app-body{display:flex;flex:1;overflow:hidden;}
 
 /* SIDEBAR */
-.sidebar{width:276px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:width .2s;}
+.sidebar{width:256px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:width .2s;}
 .sidebar.collapsed{width:0;border:none;}
-.sb-inner{width:276px;display:flex;flex-direction:column;height:100%;overflow:hidden;}
+.sb-inner{width:256px;display:flex;flex-direction:column;height:100%;overflow:hidden;}
 .sb-profile{padding:14px 16px 10px;flex-shrink:0;}
 .sb-degree{font-size:12px;font-weight:700;color:var(--tx2);margin-bottom:1px;}
 .sb-major{font-size:11px;color:var(--tx3);margin-bottom:10px;}
@@ -188,7 +188,7 @@ body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--tx1);backg
 .cc{display:flex;flex-direction:column;gap:5px;padding:12px 13px;border-radius:8px;border:1.5px solid;min-height:84px;}
 .cc-done{background:#f0fdf4;border-color:#86efac;}
 .cc-current{background:var(--amber-bg);border-color:var(--amber-b);}
-.cc-todo{background:var(--surface2);border-color:var(--border2);border-style:dashed;opacity:.85;}
+.cc-todo{background:#f0f6ff;border-color:var(--blue-b);border-style:dashed;opacity:.85;}
 .cc-ng{background:var(--red-bg);border-color:var(--red-b);}
 .cc-left{flex:1;}
 .cc-name{font-size:12px;font-weight:700;color:var(--tx1);line-height:1.35;}
@@ -196,7 +196,7 @@ body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--tx1);backg
 .cc-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;align-self:flex-start;margin-top:auto;}
 .cob-done{background:var(--green-bg);color:var(--green);}
 .cob-current{background:var(--amber-bg);color:var(--amber);}
-.cob-todo{background:var(--surface2);color:var(--tx3);}
+.cob-todo{background:var(--blue-bg);color:var(--blue);}
 .cob-ng{background:var(--red-bg);color:var(--red);}
 
 .cc-add{display:flex;align-items:center;justify-content:center;min-height:84px;border:2px dashed var(--border2);border-radius:8px;color:var(--tx4);font-size:13px;cursor:pointer;background:none;font-family:inherit;transition:border-color .12s,color .12s;width:100%;}
@@ -205,10 +205,9 @@ body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--tx1);backg
 /* 시뮬레이터 바 */
 .sim-bar-wrap{margin-bottom:10px;}
 .sim-bar-label{display:flex;justify-content:space-between;margin-bottom:4px;font-size:11px;}
-.sim-bar-track{height:9px;background:#dedad2;border-radius:5px;overflow:hidden;display:flex;}
+.sim-bar-track{height:9px;background:var(--border);border-radius:5px;overflow:hidden;display:flex;}
 .sim-bar-done{height:100%;background:var(--green);border-radius:5px 0 0 5px;transition:width .35s;}
-.sim-bar-current{height:100%;background:var(--amber);transition:width .35s;}
-.sim-bar-plan{height:100%;background:#b8b4ab;transition:width .35s;}
+.sim-bar-plan{height:100%;background:repeating-linear-gradient(45deg,#86efac,#86efac 3px,#dcfce7 3px,#dcfce7 7px);transition:width .35s;}
 .sem-empty{padding:20px 12px;text-align:center;color:var(--tx4);font-size:12px;}
 .goal-body{padding:16px;display:flex;align-items:center;gap:14px;}
 .gt-title{font-size:13px;font-weight:700;color:var(--green);}
@@ -237,10 +236,7 @@ body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--tx1);backg
 .ctbl tr:hover td{background:var(--surface2);}
 
 /* PANEL */
-.panel{width:320px;flex-shrink:0;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;transition:width .22s ease,border .22s ease;position:relative;}
-.panel.collapsed{width:0;border:none;overflow:hidden;}
-.panel-resize-handle{position:absolute;left:0;top:0;width:5px;height:100%;cursor:col-resize;z-index:10;transition:background .15s;}
-.panel-resize-handle:hover,.panel-resize-handle.dragging{background:var(--brand-b);}
+.panel{width:272px;flex-shrink:0;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;}
 .p-sec{padding:14px 16px;border-bottom:1px solid var(--border);}
 .p-sec:last-child{border:none;}
 .p-title{font-size:12px;font-weight:700;color:var(--tx1);margin-bottom:10px;}
@@ -479,15 +475,6 @@ body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--tx1);backg
           <div><div class="pw-status" id="pwStatus">-</div><div class="pw-desc" id="pwDesc">-</div></div>
         </div>
 
-        <div style="padding:10px 14px 12px;border-bottom:1px solid var(--border);flex-shrink:0">
-          <div class="stat-grid">
-            <div class="stat-card"><div class="stat-val" id="statDone">-</div><div class="stat-label">이수/수강중</div></div>
-            <div class="stat-card"><div class="stat-val" id="statExp" style="color:var(--red)">-</div><div class="stat-label">남은 학점</div></div>
-            <div class="stat-card"><div class="stat-val" id="statReq">120</div><div class="stat-label">총 학점</div></div>
-            <div class="stat-card"><div class="stat-val" id="statSem" style="color:var(--amber)">-</div><div class="stat-label">잔여 학기</div></div>
-          </div>
-        </div>
-
         <div class="sb-nav" style="padding:4px 0">
           <div class="nav-sec">졸업요건 현황<span id="badgeCnt" style="margin-left:6px;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:var(--red-bg);color:var(--red)">-</span></div>
           <div id="panelReqs" style="padding:0 8px"><!-- JS로 채움 --></div>
@@ -519,17 +506,13 @@ body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--tx1);backg
         <button onclick="openMasterDB()" style="margin-right:6px;padding:6px 12px;border:1.5px solid var(--border2);border-radius:6px;background:none;font-size:11px;color:var(--tx3);cursor:pointer;font-family:inherit;font-weight:500;transition:background .12s,color .12s" onmouseover="this.style.background='var(--surface2)';this.style.color='var(--tx1)'" onmouseout="this.style.background='none';this.style.color='var(--tx3)'">📋 전체 과목</button>
         <button class="tab-btn" onclick="openModal()">+ 과목 추가</button>
         <button onclick="manualSave()" style="margin-left:6px;padding:6px 10px;border:1.5px solid var(--border2);border-radius:6px;background:none;font-size:11px;color:var(--tx3);cursor:pointer;font-family:inherit" title="저장">저장</button>
-        <button id="simToggleBtn" onclick="togglePanel()" title="플래닝 시뮬레이터"
-          style="margin-left:6px;padding:6px 10px;border:1.5px solid var(--border2);border-radius:6px;background:none;font-size:11px;color:var(--tx3);cursor:pointer;font-family:inherit;font-weight:500;display:none;transition:background .12s,color .12s,border-color .12s"
-          onmouseover="this.style.background='var(--surface2)';this.style.color='var(--tx1)'"
-          onmouseout="this.style.background='none';this.style.color='var(--tx3)'">시뮬레이터 ▶</button>
       </div>
 
       <div id="view-planner" style="display:none;flex:1;overflow:hidden;">
         <div class="view"><div class="view-inner" id="plannerContent"><!-- JS로 채움 --></div></div>
       </div>
       <div id="view-requirements" style="display:flex;flex:1;overflow:hidden;">
-        <div class="view"><div id="reqContent" style="max-width:720px"><!-- JS로 채움 --></div></div>
+        <div class="view"><div id="reqContent"><!-- JS로 채움 --></div></div>
       </div>
       <div id="view-masterdb" style="display:none;flex:1;overflow:hidden;flex-direction:column;">
         <div style="height:42px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px;flex-shrink:0;">
@@ -542,8 +525,41 @@ body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--tx1);backg
     </main>
 
     <!-- RIGHT PANEL -->
-    <aside class="panel collapsed">
-      <div class="panel-resize-handle" id="panelResizeHandle"></div>
+    <aside class="panel">
+      <div class="panel-potato p-sec">
+        <div class="pp-bubble" id="ppBubble">PDF 분석 완료!</div>
+        <svg width="68" height="76" viewBox="0 0 100 120">
+          <defs>
+            <radialGradient id="rpc" cx="38%" cy="28%" r="68%"><stop offset="0%" stop-color="#505e7a"/><stop offset="100%" stop-color="#1a2535"/></radialGradient>
+            <radialGradient id="rpb" cx="40%" cy="22%" r="72%"><stop offset="0%" stop-color="#3d5070"/><stop offset="100%" stop-color="#1a2c42"/></radialGradient>
+            <radialGradient id="rpp" cx="36%" cy="28%" r="64%"><stop offset="0%" stop-color="#e8c050"/><stop offset="55%" stop-color="#b88020"/><stop offset="100%" stop-color="#886010"/></radialGradient>
+          </defs>
+          <g transform="rotate(-14,50,22)"><rect x="20" y="16" width="60" height="16" rx="2.5" fill="url(#rpc)"/><polygon points="6,16 50,2 94,16 50,30" fill="url(#rpb)"/><polygon points="6,16 50,2 94,16 50,30" fill="none" stroke="#0a1520" stroke-width="1"/><rect x="60" y="16" width="4" height="14" rx="1.2" fill="#f0c000"/><circle cx="62" cy="32" r="3.5" fill="#e0a800"/></g>
+          <ellipse cx="50" cy="82" rx="30" ry="30" fill="url(#rpp)"/>
+          <ellipse cx="48" cy="80" rx="27" ry="27" fill="#c8a028" opacity="0.35"/>
+          <ellipse cx="37" cy="74" rx="6.5" ry="7" fill="white"/><ellipse cx="60" cy="75" rx="5" ry="5.8" fill="white"/>
+          <circle cx="38.5" cy="75.5" r="3.6" fill="#2a1800"/><circle cx="61.5" cy="76.5" r="2.6" fill="#2a1800"/>
+          <circle cx="40" cy="74" r="1.4" fill="white"/><circle cx="63" cy="75" r="1.1" fill="white"/>
+          <path d="M30 64 Q37 61 44 64" fill="none" stroke="#7a5010" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M52 65 Q59 62 66 65" fill="none" stroke="#7a5010" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M36 91 Q50 88.5 64 91" fill="none" stroke="#7a5010" stroke-width="1.8" stroke-linecap="round"/>
+          <ellipse cx="20" cy="58" rx="2.5" ry="4.5" fill="#88ccff" opacity="0.7" transform="rotate(-15 20 58)"/>
+          <ellipse cx="18" cy="82" rx="8" ry="5.5" fill="#9a7018" transform="rotate(25 18 82)"/>
+          <ellipse cx="82" cy="83" rx="8" ry="5.5" fill="#9a7018" transform="rotate(-25 82 83)"/>
+          <ellipse cx="36" cy="114" rx="8" ry="5.5" fill="#8a6010" transform="rotate(10 36 114)"/>
+          <ellipse cx="62" cy="115" rx="8" ry="5.5" fill="#8a6010" transform="rotate(-10 62 115)"/>
+        </svg>
+        <div class="pp-label" id="ppLabel">-</div>
+      </div>
+      <div class="p-sec">
+        <div class="p-title">학점 현황</div>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-val" id="statDone">-</div><div class="stat-label">이수/수강중</div></div>
+          <div class="stat-card"><div class="stat-val" id="statExp" style="color:var(--red)">-</div><div class="stat-label">남은 학점</div></div>
+          <div class="stat-card"><div class="stat-val" id="statReq">120</div><div class="stat-label">총 학점</div></div>
+          <div class="stat-card"><div class="stat-val" id="statSem" style="color:var(--amber)">-</div><div class="stat-label">잔여 학기</div></div>
+        </div>
+      </div>
       <!-- 플래닝 시뮬레이터 -->
       <div class="p-sec">
         <div class="p-title">플래닝 시뮬레이터</div>
@@ -692,7 +708,6 @@ const DB = {
       {name:'교양 배분이수', cls:'rb-ok',   text:'12/12학점 충족'},
       {name:'교양 자유이수', cls:'rb-warn', text:'0/3학점'},
       {name:'SW 기초교육',    cls:'rb-ok',  text:'10/6학점 충족'},
-      {name:'영어강의',       cls:'rb-ok',  text:'3/3과목 충족'},
       {name:'한국어능력인증', cls:'rb-ok',   text:'해당없음'},
       {name:'졸업능력인증',  cls:'rb-ng',   text:'필수교과 미충족'},
     ],
@@ -725,9 +740,9 @@ const DB = {
       ]},
       {id:'km-1-2', label:'1학년 2학기 (2023-2)', pill:'ok', pillText:'13학점 이수완료', open:true, courses:[
         {name:'인간의가치탐색',         cr:3, area:'교양 필수교과', st:'done'},
-        {name:'매체와이미지:미디어어어', cr:3, area:'기타', st:'done'},
-        {name:'GED1435',              cr:3, area:'기타', st:'done'},
-        {name:'GED1989',              cr:3, area:'기타', st:'done'},
+        {name:'매체와이미지:미디어어어', cr:3, area:'교양 기초교과', st:'done'},
+        {name:'GED1435',              cr:3, area:'교양 기초교과', st:'done'},
+        {name:'GED1989',              cr:3, area:'교양 기초교과', st:'done'},
         {name:'프랑스어1(2) · FR1014', cr:3, area:'기타',   st:'done'},
         {name:'SLG한국어듣기말하기1',   cr:1, area:'기타',   st:'done'},
         {name:'SW기초교육(글쓰기)(s)',     cr:1, area:'교양 자유이수', st:'done'},
@@ -760,7 +775,7 @@ const DB = {
         {name:'고급시나리오창작',        cr:3, area:'전공 선택',  st:'done'},
         {name:'음악인공지능활용(s)',      cr:3, area:'교양 자유이수', st:'done'},
       ]},
-      {id:'km-3-2', label:'3학년 2학기 (2026-1)', pill:'warn', pillText:'12학점 수강중', open:true, courses:[
+      {id:'km-3-2', label:'3학년 2학기 (2025-2)', pill:'warn', pillText:'12학점 수강중', open:true, courses:[
         {name:'캡스톤디자인1(연극영화학)',cr:3, area:'전공 필수',  st:'current'},
         {name:'디지털편집실습',          cr:3, area:'전공 선택',  st:'current'},
         {name:'현대영화이론',            cr:3, area:'전공 선택',  st:'current'},
@@ -1328,6 +1343,8 @@ function renderDashboard() {
   document.getElementById('badgeCnt').textContent = ngCount + warnCount;
 
   // 패널 우측 (동적 계산값 사용)
+  document.getElementById('ppBubble').innerHTML = 'PDF 분석 완료!<br>' + selectedName + '님의 졸업요건이에요.';
+  document.getElementById('ppLabel').textContent = d.major + ' · ' + pct + '%';
   document.getElementById('statSem').textContent = d.remainSem;
 
   // 패널·학점 현황 모두 동적 계산으로 초기화
@@ -1341,18 +1358,13 @@ function renderDashboard() {
 }
 
 function calcSemPill(sem) {
-  const doneCr    = sem.courses.filter(c=>c.st==='done').reduce((s,c)=>s+c.cr,0);
-  const currentCr = sem.courses.filter(c=>c.st==='current').reduce((s,c)=>s+c.cr,0);
-  const todoCr    = sem.courses.filter(c=>c.st==='todo').reduce((s,c)=>s+c.cr,0);
-  const planCr    = currentCr + todoCr;
+  const doneCr = sem.courses.filter(c=>c.st==='done').reduce((s,c)=>s+c.cr,0);
+  const planCr = sem.courses.filter(c=>c.st==='todo'||c.st==='current').reduce((s,c)=>s+c.cr,0);
   if (sem.pill==='session') return {cls:'session', text:`${doneCr+planCr}학점 · 계절학기`, block:'session'};
   if (doneCr===0 && planCr===0) return {cls:'', text:'과목 없음', block:''};
-  if (planCr===0) return {cls:'ok', text:`${doneCr}학점 이수완료`, block:''};
-  const parts = [];
-  if (doneCr    > 0) parts.push(`${doneCr}학점 이수완료`);
-  if (currentCr > 0) parts.push(`${currentCr}학점 수강중`);
-  if (todoCr    > 0) parts.push(`${todoCr}학점 수강예정`);
-  return {cls:'warn', text: parts.join(' · '), block:'warn'};
+  if (planCr===0)  return {cls:'ok',   text:`${doneCr}학점 이수완료`, block:''};
+  if (doneCr===0)  return {cls:'warn', text:`${planCr}학점 수강예정`, block:'warn'};
+  return {cls:'warn', text:`${doneCr}학점 이수완료 · ${planCr}학점 수강예정`, block:'warn'};
 }
 
 function renderPlanner(forceOpen = {}) {
@@ -1385,13 +1397,7 @@ function renderPlanner(forceOpen = {}) {
     <div class="sem-block ${pill.block}" id="block-${sem.id}">
       <div class="sem-hd" onclick="toggleSem('${sem.id}')">
         <div class="sem-toggle"><svg class="s-arrow ${isOpen?'open':''}" id="arr-${sem.id}" width="10" height="10" viewBox="0 0 10 10"><path d="M3 1.5L7 5L3 8.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="sem-meta">
-          <span class="sem-name">${sem.label}</span>
-          <button onclick="renameSemester('${sem.id}');event.stopPropagation()" title="학기명 수정"
-            style="border:none;background:none;cursor:pointer;font-size:11px;color:var(--tx4);padding:0 3px;flex-shrink:0;transition:color .12s;line-height:1"
-            onmouseover="this.style.color='var(--brand)'" onmouseout="this.style.color='var(--tx4)'">✏️</button>
-          <span class="sem-pill ${pill.cls}" id="pill-${sem.id}">${pill.text}</span>
-        </div>
+        <div class="sem-meta"><span class="sem-name">${sem.label}</span><span class="sem-pill ${pill.cls}" id="pill-${sem.id}">${pill.text}</span></div>
         ${sem.id.startsWith('sem-') ? `<button onclick="deleteSemester('${sem.id}');event.stopPropagation()" title="학기 삭제"
           style="border:none;background:none;cursor:pointer;font-size:14px;color:var(--tx4);padding:0 8px;flex-shrink:0;transition:color .12s"
           onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--tx4)'">🗑</button>` : ''}
@@ -1477,23 +1483,6 @@ function renderPlanner(forceOpen = {}) {
   document.getElementById('plannerContent').innerHTML = html;
 }
 
-const _DIST_KEYS = ['배분이수','생명과우주','생명·우주','분석·추론','상징과문화','상징·문화','사회와평화','사회·공동체','예술창작토대','예술창작','지능·정보','인간행동의이해'];
-function matcherFor(n) {
-  if (n.includes('배분이수'))                   return c => _DIST_KEYS.some(k => c.area.includes(k));
-  if (n.includes('전공') && n.includes('기초')) return c => c.area.includes('전공') && c.area.includes('기초');
-  if (n.includes('전공') && n.includes('필수')) return c => c.area.includes('전공') && c.area.includes('필수') && !c.area.includes('교양');
-  if (n.includes('전공') && n.includes('선택')) return c => c.area.includes('전공') && c.area.includes('선택') && !c.area.includes('교양');
-  if (n.includes('필수교과'))                   return c => c.area.includes('필수교과') || (c.area.includes('교양') && c.area.includes('필수') && !c.area.includes('배분') && !c.area.includes('자유'));
-  if (n.includes('자유이수'))                   return c => c.area.includes('자유이수');
-  if (n.includes('SW'))                         return c => c.name.includes('(s)');
-  if (n.includes('영어강의'))                   return c => c.name.includes('(e)') && c.area.includes('전공');
-  if (n.includes('졸업능력인증'))               return c => c.name.includes('캡스톤') || c.area.includes('졸업필수과목');
-  return null;
-}
-function isMatchedByAnyReq(c, reqs) {
-  return reqs.some(r => { const fn = matcherFor(r.name); return fn && fn(c); });
-}
-
 function renderReqView() {
   const d = currentData;
   // 렌더 전 DOM에서 아코디언 열림 상태 스냅샷
@@ -1511,6 +1500,21 @@ function renderReqView() {
   const dynReqs = buildDynReqs(d);
   _dynReqs = [...dynReqs, {name:'기타', cls:'', text:''}];
 
+  // 요건명 → 마스터 DB 필터 함수 (buildDynReqs와 동일 매처 재활용)
+  const DIST_KEYS = ['배분이수','생명과우주','생명·우주','분석·추론','상징과문화','상징·문화','사회와평화','사회·공동체','예술창작토대','예술창작','지능·정보','인간행동의이해'];
+  function matcherFor(n) {
+    if (n.includes('배분이수'))                   return c => DIST_KEYS.some(k => c.area.includes(k));
+    if (n.includes('전공') && n.includes('기초')) return c => c.area.includes('전공') && c.area.includes('기초');
+    if (n.includes('전공') && n.includes('필수')) return c => c.area.includes('전공') && c.area.includes('필수') && !c.area.includes('교양');
+    if (n.includes('전공') && n.includes('선택')) return c => c.area.includes('전공') && c.area.includes('선택') && !c.area.includes('교양');
+    if (n.includes('필수교과'))                   return c => c.area.includes('필수교과') || (c.area.includes('교양') && c.area.includes('필수') && !c.area.includes('배분') && !c.area.includes('자유'));
+    if (n.includes('자유이수'))                   return c => c.area.includes('자유이수');
+    if (n.includes('SW'))                         return c => c.name.includes('(s)');
+    if (n.includes('영어강의'))                   return c => c.name.includes('(e)') && c.area.includes('전공');
+    if (n.includes('졸업능력인증'))               return c => c.name.includes('캡스톤') || c.area === '졸업필수과목';
+    return null;
+  }
+
   let html = dynReqs.map((r, idx) => {
     const fn = matcherFor(r.name);
     let relCourses = fn ? allCourses.filter(fn) : [];
@@ -1521,16 +1525,11 @@ function renderReqView() {
         (om.has(b._gIdx) ? om.get(b._gIdx) : Infinity));
     }
     _reqAccOrder[idx] = relCourses.map(c => c._gIdx);
-    const isEnglish  = r.name.includes('영어강의');
-    const doneCrReq  = relCourses.filter(c=>c.st==='done').reduce((s,c)=>s+c.cr,0);
-    const curCrReq   = relCourses.filter(c=>c.st==='current').reduce((s,c)=>s+c.cr,0);
-    const earnedCr   = doneCrReq + curCrReq;
-    const doneVal    = isEnglish ? relCourses.filter(c=>c.st==='done').length    : doneCrReq;
-    const curVal     = isEnglish ? relCourses.filter(c=>c.st==='current').length : curCrReq;
-    const earnedVal  = doneVal + curVal;
-    const planCnt    = relCourses.filter(c=>c.st==='todo').length;
-    const planCr     = relCourses.filter(c=>c.st==='todo').reduce((s,c)=>s+c.cr,0);
-    const planVal    = isEnglish ? planCnt : planCr;
+    const isEnglish = r.name.includes('영어강의');
+    const earnedCr  = relCourses.filter(c=>c.st==='done'||c.st==='current').reduce((s,c)=>s+c.cr,0);
+    const earnedVal = isEnglish ? relCourses.filter(c=>c.st==='done'||c.st==='current').length : earnedCr;
+    const planCnt   = relCourses.filter(c=>c.st==='todo').length;
+    const planCr    = relCourses.filter(c=>c.st==='todo').reduce((s,c)=>s+c.cr,0);
     const pmReq     = isEnglish ? r.text.match(/\/(\d+)과목/) : r.text.match(/\/(\d+)학점/);
     const pReq      = pmReq ? +pmReq[1] : 0;
     const unit      = isEnglish ? '과목' : '학점';
@@ -1541,18 +1540,15 @@ function renderReqView() {
       ? (earnedVal >= pReq ? 'b-ok' : earnedVal > 0 ? 'b-warn' : 'b-ng')
       : (r.cls==='rb-ok'?'b-ok':r.cls==='rb-warn'?'b-warn':'b-ng');
     const accentClr = cls==='b-ok'?'var(--green)':cls==='b-warn'?'var(--amber)':'var(--red)';
-    const planBadge = planVal > 0
-      ? `<span style="color:var(--tx4);font-size:10px;margin-left:4px">(+${planVal}${unit} 예정)</span>` : '';
+    const planBadge = isEnglish
+      ? (planCnt > 0 ? `<span style="color:var(--blue);font-size:10px;margin-left:4px">(+${planCnt}과목 예정)</span>` : '')
+      : (planCr  > 0 ? `<span style="color:var(--blue);font-size:10px;margin-left:4px">(+${planCr} 예정)</span>` : '');
 
-    // 프로그레스 바 (3단: 초록/노란/회색)
-    const pDonePct   = pReq > 0 ? Math.min((doneVal / pReq) * 100, 100) : 0;
-    const pCurPct    = pReq > 0 ? Math.min((curVal  / pReq) * 100, Math.max(0, 100 - pDonePct)) : 0;
-    const pRemainPct = pReq > 0 ? Math.max(0, 100 - pDonePct - pCurPct) : 0;
-    const progBar    = pReq > 0 ? `
-      <div style="height:3px;background:var(--border);border-radius:2px;margin-top:7px;overflow:hidden;display:flex">
-        <div style="width:${pDonePct.toFixed(1)}%;height:100%;background:var(--green);border-radius:2px 0 0 2px;transition:width .3s"></div>
-        <div style="width:${pCurPct.toFixed(1)}%;height:100%;background:var(--amber);transition:width .3s"></div>
-        <div style="width:${pRemainPct.toFixed(1)}%;height:100%;background:var(--border2);transition:width .3s"></div>
+    // 프로그레스 바
+    const pPct  = pReq > 0 ? Math.min((earnedVal / pReq) * 100, 100) : 0;
+    const progBar = pReq > 0 ? `
+      <div style="height:3px;background:var(--border);border-radius:2px;margin-top:7px;overflow:hidden">
+        <div style="width:${pPct.toFixed(1)}%;height:100%;background:${accentClr};transition:width .3s;border-radius:2px"></div>
       </div>` : '';
 
     // 아코디언 본문: 카드 그리드
@@ -1600,7 +1596,7 @@ function renderReqView() {
     </div>`;
 
     if (r.name.includes('자유이수')) {
-      const etcC = allCourses.filter(c => !isMatchedByAnyReq(c, dynReqs));
+      const etcC = allCourses.filter(c => c.area.includes('기타'));
       if (etcC.length > 0) {
         const eIdx  = dynReqs.length;
         const eDone = etcC.filter(c => c.st==='done'||c.st==='current').reduce((s,c)=>s+c.cr,0);
@@ -1839,18 +1835,6 @@ function collapseAll() {
       _plannerOpenStates[id] = false;
     });
   }
-}
-
-function renameSemester(semId) {
-  const sem = currentData?.semesters.find(s => s.id === semId);
-  if (!sem) return;
-  const newLabel = prompt('학기명을 수정하세요\n예: 3학년 2학기 (2026-1)', sem.label);
-  if (!newLabel || !newLabel.trim() || newLabel.trim() === sem.label) return;
-  sem.label = newLabel.trim();
-  saveState();
-  renderPlanner();
-  renderReqView();
-  toast('"' + sem.label + '"으로 수정됐어요.');
 }
 
 function deleteSemester(semId) {
@@ -2148,8 +2132,9 @@ function openReqCardEdit(gIdx) {
   renderAreaChips();
   document.getElementById('mSt').value = c.st;
   const semSel = document.getElementById('mSem');
-  semSel.innerHTML = '<option value="extra">➕ 추가 입력 (학기 미지정)</option><option disabled>──────────────</option>' +
-    (currentData?.semesters||[]).map(s => `<option value="${s.id}">${s.label}</option>`).join('');
+  semSel.innerHTML = (currentData?.semesters||[]).map(s =>
+    `<option value="${s.id}">${s.label}</option>`
+  ).join('') + '<option value="extra">➕ 추가 입력</option>';
   semSel.value = c._type === 'extra' ? 'extra' : (c._semId || 'extra');
   document.getElementById('mSemRow').style.display = 'block';
   document.getElementById('mDelBtn').style.display = 'inline-flex';
@@ -2217,8 +2202,9 @@ function openSemCourseEdit(semId, ci) {
   renderAreaChips();
   document.getElementById('mSt').value = c.st;
   const semSel = document.getElementById('mSem');
-  semSel.innerHTML = '<option value="extra">➕ 추가 입력 (학기 미지정)</option><option disabled>──────────────</option>' +
-    (currentData?.semesters||[]).map(s => `<option value="${s.id}">${s.label}</option>`).join('');
+  semSel.innerHTML = (currentData?.semesters||[]).map(s =>
+    `<option value="${s.id}">${s.label}</option>`
+  ).join('') + '<option value="extra">➕ 추가 입력</option>';
   semSel.value = semId;
   document.getElementById('mSemRow').style.display = 'block';
   document.getElementById('mDelBtn').style.display = 'inline-flex';
@@ -2232,29 +2218,6 @@ function toggleReqCat(hd) {
   hd.nextElementSibling.classList.toggle('open');
 }
 
-let _panelOpen = false;
-
-function togglePanel() {
-  _panelOpen = !_panelOpen;
-  const panel = document.querySelector('.panel');
-  const btn   = document.getElementById('simToggleBtn');
-  panel.classList.toggle('collapsed', !_panelOpen);
-  if (btn) btn.textContent = _panelOpen ? '시뮬레이터 ◀' : '시뮬레이터 ▶';
-  if (_panelOpen) renderSimBar();
-}
-
-function setPanelOpen(open) {
-  _panelOpen = open;
-  const panel = document.querySelector('.panel');
-  const btn   = document.getElementById('simToggleBtn');
-  panel.classList.toggle('collapsed', !open);
-  if (btn) {
-    btn.textContent = open ? '시뮬레이터 ◀' : '시뮬레이터 ▶';
-    btn.style.display = 'inline-flex';
-  }
-  if (open) renderSimBar();
-}
-
 function switchTab(t) {
   document.querySelectorAll('.tab').forEach(e => e.classList.remove('active'));
   const tabEl = document.getElementById('tab-'+t);
@@ -2263,8 +2226,8 @@ function switchTab(t) {
     document.getElementById('view-'+v).style.display = v===t ? 'flex' : 'none';
   });
   if (t === 'masterdb') renderMasterDB();
-  else if (t === 'requirements') { renderReqView(); setPanelOpen(false); }
-  else if (t === 'planner')      { renderPlanner(); setPanelOpen(true);  }
+  else if (t === 'requirements') renderReqView();
+  else if (t === 'planner') { renderPlanner(); renderSimBar(); }
 }
 
 const AREA_OPTIONS = ['전공 기초','전공 필수','전공 선택','교양 필수교과','교양 배분이수','교양 기초교과','교양 자유이수','졸업필수과목','기타'];
@@ -2318,8 +2281,9 @@ function openModal(targetSemId) {
   _editTarget = null;
   _setModalMode(false);
   const semSel = document.getElementById('mSem');
-  semSel.innerHTML = '<option value="extra">➕ 추가 입력 (학기 미지정)</option><option disabled>──────────────</option>' +
-    (currentData?.semesters||[]).map(s => `<option value="${s.id}">${s.label}</option>`).join('');
+  semSel.innerHTML = (currentData?.semesters||[]).map(s =>
+    `<option value="${s.id}">${s.label}</option>`
+  ).join('') + '<option value="extra">➕ 추가 입력</option>';
   semSel.value = targetSemId || 'extra';
   document.getElementById('mSemRow').style.display = 'block';
   document.getElementById('mDelBtn').style.display = 'none';
@@ -2357,8 +2321,9 @@ function openEditModal(gIdx) {
   document.getElementById('mSt').value = c.st;
   // 수강 학기 선택
   const semSel = document.getElementById('mSem');
-  semSel.innerHTML = '<option value="extra">➕ 추가 입력 (학기 미지정)</option><option disabled>──────────────</option>' +
-    (currentData?.semesters||[]).map(s => `<option value="${s.id}">${s.label}</option>`).join('');
+  semSel.innerHTML = (currentData?.semesters||[]).map(s =>
+    `<option value="${s.id}">${s.label}</option>`
+  ).join('') + '<option value="extra">➕ 추가 입력</option>';
   semSel.value = c._type === 'extra' ? 'extra' : (c._semId || 'extra');
   document.getElementById('mSemRow').style.display = 'block';
   document.getElementById('mDelBtn').style.display = 'inline-flex';
@@ -2458,114 +2423,70 @@ function addCourse() {
 // ══════════════════════════════════════
 // 플래닝 시뮬레이터 바
 // ══════════════════════════════════════
-let _prevSimPlanOkSet = new Set(); // 이전 렌더에서 이미 충족된 요건 추적 (toast 중복 방지)
+let _prevSimPlanOkSet = new Set(); // 이전 렌더에서 충족된 요건 추적 (toast 중복 방지)
 function renderSimBar() {
   const d = currentData;
   const el = document.getElementById('simBars');
   if (!d || !el) return;
 
   const allCourses = [...d.semesters.flatMap(s => s.courses), ...extraCourses];
-  const total      = d.totalRequired || 120;
+  const total   = d.totalRequired || 120;
   const notGradOnly = c => c.area.trim() !== '졸업필수과목';
-  const doneCr    = allCourses.filter(c => c.st === 'done'    && notGradOnly(c)).reduce((s, c) => s + c.cr, 0);
-  const currentCr = allCourses.filter(c => c.st === 'current' && notGradOnly(c)).reduce((s, c) => s + c.cr, 0);
-  const planCr    = allCourses.filter(c => c.st === 'todo'    && notGradOnly(c)).reduce((s, c) => s + c.cr, 0);
-  const donePct    = Math.min((doneCr    / total) * 100, 100);
-  const currentPct = Math.min((currentCr / total) * 100, Math.max(0, 100 - donePct));
-  const remainPct  = Math.max(0, 100 - donePct - currentPct); // 잔여가 나머지 전체를 채움
+  const doneCr  = allCourses.filter(c => c.st === 'done' && notGradOnly(c)).reduce((s, c) => s + c.cr, 0);
+  const planCr  = allCourses.filter(c => c.st === 'todo' && notGradOnly(c)).reduce((s, c) => s + c.cr, 0);
+  const donePct = Math.min((doneCr / total) * 100, 100);
+  const planPct = Math.min((planCr / total) * 100, Math.max(0, 100 - donePct));
 
-  // 요건별 미니 시뮬 — done-only 패스 (current 임시 제외, try-finally로 복원 보장)
-  const curCourses = allCourses.filter(c => c.st === 'current');
-  let dynDoneOnly;
-  curCourses.forEach(c => { c.st = '_cur'; });
-  try { dynDoneOnly = buildDynReqs(d); } finally { curCourses.forEach(c => { c.st = 'current'; }); }
-
-  const dynDone = buildDynReqs(d); // done + current
-
-  // todo → done 임시 처리로 충족 예측
+  // 요건별 미니 시뮬 (DONE+PLAN 합산으로 충족 여부 예측)
+  const dynDone = buildDynReqs(d);
+  // PLANNING 과목을 일시적으로 'done' 처리하여 충족 예측
   const planCourses = allCourses.filter(c => c.st === 'todo');
   planCourses.forEach(c => { c.st = 'done'; });
   const dynWithPlan = buildDynReqs(d);
   planCourses.forEach(c => { c.st = 'todo'; });
 
-  // 요건별 미니 바 (3단) — 전체 이수율은 맨 아래
-  let html = ``;
+  // 전체 이수율 바
+  let html = `
+    <div class="sim-bar-wrap">
+      <div class="sim-bar-label">
+        <span style="color:var(--tx3)">전체 이수율</span>
+        <span style="font-weight:700;color:var(--tx2)">완료 ${doneCr}<span style="color:var(--tx4)">/${total}학점</span>
+          ${planCr > 0 ? `<span style="color:var(--blue);font-size:10px;font-weight:600"> +${planCr} 예정</span>` : ''}</span>
+      </div>
+      <div class="sim-bar-track">
+        <div class="sim-bar-done" style="width:${donePct.toFixed(1)}%"></div>
+        <div class="sim-bar-plan" style="width:${planPct.toFixed(1)}%"></div>
+      </div>
+    </div>`;
+
+  // 요건별 미니 바 (변화 있는 항목만)
   dynDone.forEach((r, i) => {
     const rp = dynWithPlan[i];
-    const rd = dynDoneOnly[i];
     if (!rp) return;
     const wasOk = r.cls === 'rb-ok';
     const nowOk = rp.cls === 'rb-ok';
     const m = rp.text.match(/^(\d+)\/(\d+)(학점|과목)/);
     if (!m) return;
     const earn = +m[1], req = +m[2], unit = m[3];
-    const isEng       = unit === '과목';
-    const earDoneOnly = +(rd?.text.match(/^(\d+)/) || [0,0])[1];
-    const earCurrent  = Math.max(0, +(r.text.match(/^(\d+)/) || [0,0])[1] - earDoneOnly);
-    const planPortion = Math.max(0, earn - earDoneOnly - earCurrent);
-    const remainVal   = Math.max(0, req - earDoneOnly - earCurrent - planPortion);
-    const barDone    = Math.min((earDoneOnly              / req) * 100, 100);
-    const barCurrent = Math.min((earCurrent               / req) * 100, Math.max(0, 100 - barDone));
-    const barRemain  = Math.min((Math.max(0, planPortion) / req) * 100, Math.max(0, 100 - barDone - barCurrent)); // todo 과목만큼 표시 → 시뮬레이션 가시성
-    const checkMark  = nowOk && !wasOk ? ' 🎯' : nowOk ? ' ✓' : '';
-
-    // 영어강의(과목 단위)는 기존 포맷 유지, 나머지는 완료/수강중/잔여 포맷
-    const rightLabel = isEng
-      ? `<span style="color:var(--green)">${earDoneOnly}</span>${earCurrent>0?`<span style="color:var(--amber)">+${earCurrent}</span>`:''}${planPortion>0?`<span style="color:var(--tx4)">+${planPortion}</span>`:''}/${req}과목${checkMark}`
-      : `<span style="color:var(--green)">완료 ${earDoneOnly}</span> <span style="color:var(--tx4);font-weight:400">·</span> <span style="color:var(--amber)">수강중 ${earCurrent}</span> <span style="color:var(--tx4);font-weight:400">·</span> <span style="color:var(--tx3)">잔여 ${remainVal}</span> <span style="${remainVal===0 ? 'color:var(--tx1);font-weight:700' : 'color:var(--tx4);font-weight:400'}">/ ${req}학점</span>${checkMark}`;
-
+    const earDone = +(r.text.match(/^(\d+)/)||[0,0])[1];
+    const planPortion = earn - earDone;
+    const barDone = Math.min((earDone / req) * 100, 100);
+    const barPlan = Math.min((planPortion / req) * 100, Math.max(0, 100 - barDone));
     html += `
       <div class="sim-bar-wrap">
-        <div class="sim-bar-label" style="flex-direction:column;gap:2px;margin-bottom:5px">
+        <div class="sim-bar-label">
           <span style="color:var(--tx3);font-size:10px">${r.name}</span>
-          <span style="font-size:10px;font-weight:700">${rightLabel}</span>
+          <span style="font-size:10px;font-weight:700;color:${nowOk?'var(--green)':planPortion>0?'var(--blue)':'var(--tx3)'}">
+            ${earDone}${planPortion>0?`<span style="color:var(--blue)">+${planPortion}</span>`:''}/${req}${unit}
+            ${nowOk && !wasOk ? '🎯' : nowOk ? '✓' : ''}
+          </span>
         </div>
         <div class="sim-bar-track" style="height:6px">
-          <div class="sim-bar-done"    style="width:${barDone.toFixed(1)}%;border-radius:3px 0 0 3px"></div>
-          <div class="sim-bar-current" style="width:${barCurrent.toFixed(1)}%"></div>
-          <div class="sim-bar-plan"    style="width:${barRemain.toFixed(1)}%"></div>
+          <div class="sim-bar-done" style="width:${barDone.toFixed(1)}%;border-radius:3px 0 0 3px"></div>
+          <div class="sim-bar-plan" style="width:${barPlan.toFixed(1)}%"></div>
         </div>
       </div>`;
   });
-
-  // 기타 영역 미니 바 (충족요건 없음 — 합산 표시만)
-  const etcSim = allCourses.filter(c => !isMatchedByAnyReq(c, dynDone));
-  if (etcSim.length > 0) {
-    const etcDone = etcSim.filter(c=>c.st==='done').reduce((s,c)=>s+c.cr,0);
-    const etcCur  = etcSim.filter(c=>c.st==='current').reduce((s,c)=>s+c.cr,0);
-    const etcPlan = etcSim.filter(c=>c.st==='todo').reduce((s,c)=>s+c.cr,0);
-    const etcBD   = Math.min((etcDone / total) * 100, 100);
-    const etcBC   = Math.min((etcCur  / total) * 100, Math.max(0, 100 - etcBD));
-    const etcBP   = Math.min((etcPlan / total) * 100, Math.max(0, 100 - etcBD - etcBC));
-    const etcTotal = etcDone + etcCur + etcPlan;
-    html += `
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;margin-bottom:4px">
-        <span style="color:var(--tx3);font-size:10px">기타</span>
-        <span style="font-size:10px;font-weight:700;color:var(--tx2)">${etcTotal}학점 합산${etcPlan > 0 ? `<span style="color:var(--tx4);font-weight:400"> (+${etcPlan} 예정)</span>` : ''}</span>
-      </div>`;
-  }
-
-  // 전체 이수율 — 맨 아래, 완료/수강중/잔여 포맷
-  const totalRemainder = Math.max(0, total - doneCr - currentCr - planCr);
-  html += `
-    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:10px">
-      <div class="sim-bar-label" style="margin-bottom:5px;align-items:center">
-        <span style="font-size:11px;font-weight:700;color:var(--tx2)">전체 이수율</span>
-        <span style="display:flex;gap:6px;align-items:center;font-size:10px;font-weight:700">
-          <span style="color:var(--green)">완료 ${doneCr}</span>
-          <span style="color:var(--tx4);font-weight:400">·</span>
-          <span style="color:var(--amber)">수강중 ${currentCr}</span>
-          <span style="color:var(--tx4);font-weight:400">·</span>
-          <span style="color:var(--tx3)">잔여 ${totalRemainder}</span>
-          <span style="color:var(--tx4);font-weight:400">/ ${total} 총 학점</span>
-        </span>
-      </div>
-      <div class="sim-bar-track">
-        <div class="sim-bar-done"    style="width:${donePct.toFixed(1)}%"></div>
-        <div class="sim-bar-current" style="width:${currentPct.toFixed(1)}%"></div>
-        <div class="sim-bar-plan"    style="width:${remainPct.toFixed(1)}%"></div>
-      </div>
-    </div>`;
 
   el.innerHTML = html;
 
@@ -2602,38 +2523,6 @@ function toast(msg) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
 }
-
-// 플래닝 시뮬레이터 패널 드래그 리사이즈
-(function() {
-  const PANEL_MIN = 320;
-  const handle = document.getElementById('panelResizeHandle');
-  if (!handle) return;
-  handle.addEventListener('mousedown', e => {
-    const panel = document.querySelector('.panel');
-    if (!panel || panel.classList.contains('collapsed')) return;
-    const startX     = e.clientX;
-    const startWidth = panel.offsetWidth;
-    panel.style.transition = 'none';
-    handle.classList.add('dragging');
-    document.body.style.cursor    = 'col-resize';
-    document.body.style.userSelect = 'none';
-    const onMove = ev => {
-      const w = Math.max(PANEL_MIN, startWidth - (ev.clientX - startX));
-      panel.style.width = w + 'px';
-    };
-    const onUp = () => {
-      document.removeEventListener('mousemove', onMove);
-      document.removeEventListener('mouseup',   onUp);
-      panel.style.transition     = '';
-      handle.classList.remove('dragging');
-      document.body.style.cursor     = '';
-      document.body.style.userSelect = '';
-    };
-    document.addEventListener('mousemove', onMove);
-    document.addEventListener('mouseup',   onUp);
-    e.preventDefault();
-  });
-})();
 </script>
 </body>
 </html>
