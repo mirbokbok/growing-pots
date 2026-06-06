@@ -158,6 +158,14 @@ body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--tx1);backg
 .alert-box{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:var(--r);margin-bottom:16px;font-size:12px;line-height:1.5;background:var(--amber-bg);border:1px solid var(--amber-b);color:#92400e;}
 .alert-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
 
+/* SEM CHIP (학기 직접 입력 칩) */
+.sem-chip{padding:4px 12px;border:1px solid var(--border2);border-radius:20px;background:none;cursor:pointer;font-size:12px;color:var(--tx3);font-family:inherit;transition:all .12s;}
+.sem-chip:hover,.sem-chip.active{background:var(--blue-bg);border-color:var(--blue-b);color:var(--blue);}
+/* BULK EDIT MENU */
+.bulk-menu{position:absolute;right:0;top:calc(100% + 4px);background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:50;min-width:140px;overflow:hidden;display:none;}
+.bulk-menu button{display:block;width:100%;padding:8px 14px;text-align:left;background:none;border:none;font-family:inherit;font-size:12px;color:var(--tx2);cursor:pointer;transition:background .1s;}
+.bulk-menu button:hover{background:var(--surface2);}
+
 /* SEM BLOCKS */
 .sem-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);margin-bottom:10px;overflow:hidden;box-shadow:var(--sh);}
 .sem-block.warn{border-color:var(--amber-b);}
@@ -567,7 +575,16 @@ body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--tx1);backg
       <input type="hidden" id="mArea" value="전공 기초"/>
       <label class="f-label">이수 상태</label><select class="f-select" id="mSt"><option value="done">이수 완료</option><option value="current">수강 중</option><option value="todo">수강 예정</option></select>
       <div id="mSemRow" style="display:none">
-        <label class="f-label">수강 학기</label><select class="f-select" id="mSem" style="margin:0"></select>
+        <label class="f-label">수강 학기</label>
+        <select class="f-select" id="mSem" style="margin-bottom:8px" onchange="onSemSelChange(this.value)"></select>
+        <div id="mSemCustomRow" style="display:none">
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
+            <button type="button" class="sem-chip" onclick="selectSemChip(this,'교환학기')">교환학기</button>
+            <button type="button" class="sem-chip" onclick="selectSemChip(this,'계절학기(하)')">계절학기(하)</button>
+            <button type="button" class="sem-chip" onclick="selectSemChip(this,'계절학기(동)')">계절학기(동)</button>
+          </div>
+          <input type="text" class="f-input" id="mSemCustom" placeholder="학기명 직접 입력 (예: 교환학기)" style="margin:0" oninput="onSemCustomInput(this.value)"/>
+        </div>
       </div>
     </div>
     <div class="modal-ft">
@@ -1390,6 +1407,17 @@ function renderPlanner(forceOpen = {}) {
             onmouseover="this.style.color='var(--brand)'" onmouseout="this.style.color='var(--tx4)'">✏️</button>
           <span class="sem-pill ${pill.cls}" id="pill-${sem.id}">${pill.text}</span>
         </div>
+        <div style="position:relative;flex-shrink:0;margin-left:2px">
+          <button onclick="toggleBulkMenu('${sem.id}',event)" title="일괄 편집"
+            style="border:1px solid var(--border2);background:none;cursor:pointer;font-size:11px;font-family:inherit;font-weight:600;color:var(--tx3);padding:3px 8px;border-radius:5px;transition:all .12s"
+            onmouseover="this.style.background='var(--surface2)';this.style.color='var(--tx1)'"
+            onmouseout="this.style.background='none';this.style.color='var(--tx3)'">편집 ▾</button>
+          <div class="bulk-menu" id="bulk-${sem.id}">
+            <button onclick="bulkSetSemStatus('${sem.id}','done',event)">✓ 전체 이수완료</button>
+            <button onclick="bulkSetSemStatus('${sem.id}','current',event)">▶ 전체 수강중</button>
+            <button onclick="bulkSetSemStatus('${sem.id}','todo',event)">○ 전체 수강예정</button>
+          </div>
+        </div>
         ${sem.id.startsWith('sem-') ? `<button onclick="deleteSemester('${sem.id}');event.stopPropagation()" title="학기 삭제"
           style="border:none;background:none;cursor:pointer;font-size:14px;color:var(--tx4);padding:0 8px;flex-shrink:0;transition:color .12s"
           onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--tx4)'">🗑</button>` : ''}
@@ -2149,6 +2177,12 @@ function openReqCardEdit(gIdx) {
   semSel.innerHTML = '<option value="extra">➕ 추가 입력 (학기 미지정)</option><option disabled>──────────────</option>' +
     (currentData?.semesters||[]).map(s => `<option value="${s.id}">${s.label}</option>`).join('');
   semSel.value = c._type === 'extra' ? 'extra' : (c._semId || 'extra');
+  const isExtra = semSel.value === 'extra';
+  document.getElementById('mSemCustomRow').style.display = isExtra ? 'block' : 'none';
+  if (isExtra && c.semLabel) {
+    document.getElementById('mSemCustom').value = c.semLabel;
+    document.querySelectorAll('.sem-chip').forEach(b => b.classList.toggle('active', b.textContent === c.semLabel));
+  }
   document.getElementById('mSemRow').style.display = 'block';
   document.getElementById('mDelBtn').style.display = 'inline-flex';
   _setModalMode(true);
@@ -2218,6 +2252,7 @@ function openSemCourseEdit(semId, ci) {
   semSel.innerHTML = '<option value="extra">➕ 추가 입력 (학기 미지정)</option><option disabled>──────────────</option>' +
     (currentData?.semesters||[]).map(s => `<option value="${s.id}">${s.label}</option>`).join('');
   semSel.value = semId;
+  document.getElementById('mSemCustomRow').style.display = 'none';
   document.getElementById('mSemRow').style.display = 'block';
   document.getElementById('mDelBtn').style.display = 'inline-flex';
   _setModalMode(true);
@@ -2307,6 +2342,48 @@ function toggleAreaChip(area) {
   renderAreaChips();
 }
 
+// ── 학기 직접 입력 칩 ──
+function onSemSelChange(val) {
+  const row = document.getElementById('mSemCustomRow');
+  if (!row) return;
+  row.style.display = val === 'extra' ? 'block' : 'none';
+  if (val !== 'extra') {
+    document.getElementById('mSemCustom').value = '';
+    document.querySelectorAll('.sem-chip').forEach(c => c.classList.remove('active'));
+  }
+}
+function selectSemChip(btn, label) {
+  document.getElementById('mSemCustom').value = label;
+  document.querySelectorAll('.sem-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+}
+function onSemCustomInput(val) {
+  document.querySelectorAll('.sem-chip').forEach(c => {
+    c.classList.toggle('active', c.textContent === val);
+  });
+}
+
+// ── 학기 일괄 편집 ──
+function toggleBulkMenu(semId, e) {
+  e.stopPropagation();
+  const menu = document.getElementById('bulk-' + semId);
+  if (!menu) return;
+  const isOpen = menu.style.display === 'block';
+  document.querySelectorAll('.bulk-menu').forEach(m => m.style.display = 'none');
+  menu.style.display = isOpen ? 'none' : 'block';
+}
+function bulkSetSemStatus(semId, st, e) {
+  e.stopPropagation();
+  document.querySelectorAll('.bulk-menu').forEach(m => m.style.display = 'none');
+  const sem = currentData?.semesters.find(s => s.id === semId);
+  if (!sem || !sem.courses.length) { toast('과목이 없어요.'); return; }
+  sem.courses.forEach(c => c.st = st);
+  saveState(); refreshPanel(); renderPlanner(); renderReqView(); renderSimBar();
+  const label = {done:'이수완료', current:'수강중', todo:'수강예정'}[st] || st;
+  toast(`"${sem.label}" 전체 과목 → ${label}`);
+}
+document.addEventListener('click', () => document.querySelectorAll('.bulk-menu').forEach(m => m.style.display = 'none'));
+
 function _setModalMode(isEdit) {
   document.querySelector('.modal-title').textContent  = isEdit ? '과목 수정' : '과목 추가';
   document.querySelector('.modal-ft .btn-p').textContent = isEdit ? '수정하기' : '추가하기';
@@ -2358,6 +2435,12 @@ function openEditModal(gIdx) {
   semSel.innerHTML = '<option value="extra">➕ 추가 입력 (학기 미지정)</option><option disabled>──────────────</option>' +
     (currentData?.semesters||[]).map(s => `<option value="${s.id}">${s.label}</option>`).join('');
   semSel.value = c._type === 'extra' ? 'extra' : (c._semId || 'extra');
+  const isExtraE = semSel.value === 'extra';
+  document.getElementById('mSemCustomRow').style.display = isExtraE ? 'block' : 'none';
+  if (isExtraE && c.semLabel) {
+    document.getElementById('mSemCustom').value = c.semLabel;
+    document.querySelectorAll('.sem-chip').forEach(b => b.classList.toggle('active', b.textContent === c.semLabel));
+  }
   document.getElementById('mSemRow').style.display = 'block';
   document.getElementById('mDelBtn').style.display = 'inline-flex';
   _setModalMode(true);
@@ -2372,6 +2455,9 @@ function closeModal() {
   document.getElementById('mCr').value = '3';
   document.getElementById('mCrCustom').style.display = 'none';
   document.getElementById('mSemRow').style.display = 'none';
+  document.getElementById('mSemCustomRow').style.display = 'none';
+  document.getElementById('mSemCustom').value = '';
+  document.querySelectorAll('.sem-chip').forEach(c => c.classList.remove('active'));
   document.getElementById('mDelBtn').style.display = 'none';
   document.getElementById('mArea').value = '전공 기초';
   renderAreaChips();
@@ -2406,8 +2492,9 @@ function addCourse() {
   if (!cr || cr < 1) { document.getElementById('mCrCustom').style.borderColor='var(--red)'; return; }
 
   // 유효성 통과 후 모달 값 먼저 캡처 → 즉시 닫기
-  const newData  = {name, cr, area:document.getElementById('mArea').value, st:document.getElementById('mSt').value};
   const newSemId = document.getElementById('mSem').value;
+  const semLabel = newSemId === 'extra' ? (document.getElementById('mSemCustom')?.value.trim() || '') : '';
+  const newData  = {name, cr, area:document.getElementById('mArea').value, st:document.getElementById('mSt').value, ...(semLabel ? {semLabel} : {})};
   const em = _editMode, et = _editTarget;
   document.getElementById('mName').value = '';
   document.getElementById('mName').style.borderColor = '';
